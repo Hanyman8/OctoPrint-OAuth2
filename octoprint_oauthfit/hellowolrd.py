@@ -8,6 +8,6 @@ class HelloWorldPlugin(octoprint.plugin.StartupPlugin):
         self._logger.info("Hello World!")
 
 __plugin_name__ = "Hello World"
-__plugin_version__ = "1.0.0"
+__plugin_version__ = "0.0.1"
 __plugin_description__ = "A quick \"Hello World\" example plugin for OctoPrint"
 __plugin_implementation__ = HelloWorldPlugin()
