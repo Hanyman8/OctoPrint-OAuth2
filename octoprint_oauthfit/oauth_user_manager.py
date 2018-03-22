@@ -1,4 +1,3 @@
-
 from flask.ext.login import UserMixin
 from flask.ext.principal import Identity
 
@@ -19,7 +18,7 @@ from octoprint.users import UserAlreadyExists
 from octoprint.util import atomic_write, to_str, deprecated
 
 
-#def user_factory_hook(components, settings, *args, **kwargs):
+# def user_factory_hook(components, settings, *args, **kwargs):
 #	return OAuthbasedUserManager
 
 class OAuthbasedUserManager(UserManager):
@@ -29,7 +28,7 @@ class OAuthbasedUserManager(UserManager):
 		UserManager.__init__(self)
 
 		userfile = settings().get(["accessControl", "userfile"])
-		#logging.getLogger("octoprint.plugins." + __name__).info(userfile.items() + "  <<<< Userfile")
+		# logging.getLogger("octoprint.plugins." + __name__).info(userfile.items() + "  <<<< Userfile")
 		if userfile is None:
 			logging.getLogger("octoprint.plugins." + __name__).info("#######3333 - no userfile ######")
 			userfile = os.path.join(settings().getBaseFolder("base"), "users2.yaml")
@@ -49,14 +48,15 @@ class OAuthbasedUserManager(UserManager):
 				data = yaml.safe_load(f)
 				for name in data.keys():
 					attributes = data[name]
-					print(data.items())
+	#				print(data.items())
 					apikey = None
 					if "apikey" in attributes:
 						apikey = attributes["apikey"]
 					settings = dict()
 					if "settings" in attributes:
 						settings = attributes["settings"]
-					self._users[name] = User(name, attributes["password"], attributes["active"], attributes["roles"], apikey=apikey, settings=settings)
+					self._users[name] = User(name, attributes["password"], attributes["active"], attributes["roles"],
+											 apikey=apikey, settings=settings)
 					for sessionid in self._sessionids_by_userid.get(name, set()):
 						if sessionid in self._session_users_by_session:
 							self._session_users_by_session[sessionid].update_user(self._users[name])
@@ -305,6 +305,7 @@ class OAuthbasedUserManager(UserManager):
 	def hasBeenCustomized(self):
 		return self._customized
 
+
 class SessionUser(wrapt.ObjectProxy):
 	def __init__(self, user):
 		print(" MAKING session user")
@@ -335,6 +336,7 @@ class SessionUser(wrapt.ObjectProxy):
 	def __repr__(self):
 		return "SessionUser({!r},session={},created={})".format(self.__wrapped__, self.session, self.created)
 
+
 class DummyUser(User):
 	def __init__(self):
 		User.__init__(self, "dummy", "", True, UserManager.valid_roles)
@@ -342,9 +344,11 @@ class DummyUser(User):
 	def check_password(self, passwordHash):
 		return True
 
+
 class DummyIdentity(Identity):
 	def __init__(self):
 		Identity.__init__(self, "dummy")
+
 
 def dummy_identity_loader():
 	return DummyIdentity()

@@ -1,86 +1,92 @@
-from typing import Dict, Any, List
+CLIENT_ID = "26cc1117-f7b5-4781-af91-ba7baecb47c4"
+CLIENT_SECRET = "3zjAAtVhWNsXFgF83eH41J6YgNrvVekQ"
+REDIRECT_URI = "http://localhost:65010/oauth_test_callback"
 
-from requests import HTTPError
-from raven.contrib.django.raven_compat.models import client
-from social_core.backends.oauth import BaseOAuth2
+from flask import Flask
+from flask import abort, request
+import requests
+import requests.auth
+import urllib, json
 
 
-class NotFoundInUsermapAPI(Exception):
+app = Flask(__name__)
+
+
+@app.route('/')
+def homepage():
+    text = '<a href="%s">Authenticate with fitauth</a>'
+    return text % make_authorization_url()
+
+
+@app.route('/oauth_test_callback')
+def oauth_test_callback():
+    error = request.args.get('error', '')
+    if error:
+        return "Error: " + error
+    state = request.args.get('state', '')
+    if not is_valid_state(state):
+        # Uh-oh, this request wasn't started by us!
+        abort(403)
+    code = request.args.get('code')
+    # We'll change this next line in just a moment
+    access_token = get_token(code)
+    return "Your name is: %s" % get_username(access_token)
+
+
+def get_token(code):
+    client_auth = requests.auth.HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
+    post_data = {"grant_type": "authorization_code",
+                 "code": code,
+                 "redirect_uri": REDIRECT_URI}
+    response = requests.post("https://auth.fit.cvut.cz/oauth/token",
+                             auth=client_auth,
+                             data=post_data)
+    token_json = response.json()
+    return token_json["access_token"]
+
+
+def get_username(access_token):
+    params = {
+        'token': access_token
+    }
+    url = 'https://auth.fit.cvut.cz/oauth/api/v1/tokeninfo?' + urllib.urlencode(params)
+    print("=====1111====" + url)
+    response = urllib.urlopen(url)
+    data = json.loads(response.read())
+
+    print("-------------------------")
+    print(data)
+    print("-----------2222----------")
+    print(data["user_id"])
+
+    return data["user_id"]
+
+
+def make_authorization_url():
+    # Generate a random string for the state parameter
+    # Save it for use later to prevent xsrf attacks
+    from uuid import uuid4
+    state = str(uuid4())
+    save_created_state(state)
+    params = {"response_type": "code",
+              "client_id": CLIENT_ID,
+              "redirect_uri": REDIRECT_URI,
+              "state": state}
+    url = "https://auth.fit.cvut.cz/oauth/authorize?" + urllib.urlencode(params)
+   # print(url)
+    return url
+
+
+# Left as an exercise to the reader.
+# You may want to store valid states in a database or memcache,
+# or perhaps cryptographically sign them and verify upon retrieval.
+def save_created_state(state):
     pass
 
 
-class FITOAuth2(BaseOAuth2):
-    name = 'fit'
-    AUTHORIZATION_URL = 'https://auth.fit.cvut.cz/oauth/oauth/authorize'
-    ACCESS_TOKEN_URL = 'https://auth.fit.cvut.cz/oauth/oauth/token'
-    ACCESS_TOKEN_METHOD = 'POST'
-    ID_KEY = 'user_id'
-    EXTRA_DATA = [('roles', 'roles')]
-    CTU_PARTS = {
-        11000: "FSv",
-        12000: "FS",
-        13000: "FEL",
-        14000: "FJFI",
-        15000: "FA",
-        16000: "FD",
-        17000: "FBMI",
-        18000: "FIT",
-        31000: "KLOK",
-        32000: "MÚVS",
-        34000: "ÚTVS",
-        35000: "ÚTEF",
-        36000: "UCEEB",
-        37000: "CIIRC",
-    }
-
-    def get_user_details(self, response):
-        """Return user details from FIT account"""
-        return {'username': response.get('user_id'),
-                'email': response.get('user_email'),
-                'first_name': response.get('firstName'),
-                'last_name': response.get('lastName')}
-
-    def user_data(self, access_token, *args, **kwargs):
-        """Loads user data from service"""
-        url = 'https://auth.fit.cvut.cz/oauth/api/v1/tokeninfo'
-        try:
-            data = self.get_json(url, params={'token': access_token})
-        except ValueError:
-            return None
-
-        usermap_url = 'https://kosapi.fit.cvut.cz/usermap/v1/people/' + data['user_id']
-        try:
-            usermap = self.get_json(usermap_url, headers={'Authorization': 'Bearer %s' % access_token})
-            data.update(usermap)
-        except ValueError:
-            pass
-        except HTTPError as e:
-            if e.response.status_code == 404:
-                client.captureException()
-                raise NotFoundInUsermapAPI()
-            raise
-
-        return data
+def is_valid_state(state):
+    return True
 
 
-def get_roles(user):
-    """Gets latest roles of given user"""
-    extra_data = user.social_auth.values("extra_data").latest(field_name='pk')["extra_data"]
-    try:
-        if extra_data['roles']:
-            return extra_data['roles']
-    except KeyError:
-        pass
-    return []
-
-
-def get_faculties(extra_data: Dict[str, Any]) -> List[str]:
-    roles = extra_data.get("roles", [])
-
-    faculties = set()
-
-    for key, value in FITOAuth2.CTU_PARTS.items():
-        if "B-{}-STUDENT".format(key) in roles or "B-{}-ZAMESTNANEC".format(key) in roles:
-            faculties.add(value)
-
-    return list(faculties)
+if __name__ == '__main__':
+    app.run(debug=True, port=65010)
