@@ -1,3 +1,4 @@
+
 from octoprint.users import *
 
 
@@ -6,6 +7,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 		logging.getLogger("octoprint.plugins." + __name__).info("#######2222######")
 		FilebasedUserManager.__init__(self)
+
 
 	def login_user(self, user):
 		self._cleanup_sessions()
@@ -48,7 +50,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		self._dirty = True
 		self._save()
 
-	def checkPassword(self, usernameU, password):
+	def checkPassword(self, username, password):
 		print("Checking password")
 		user = self.findUser(username)
 		if not user:
