@@ -13,27 +13,34 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		self._cleanup_sessions()
 
 		logging.getLogger("octoprint.plugins." + __name__).info("#######5555 - My login ######")
-		print(" MY LOGIN ")
+		print(" MY LOGIN user = ")
 		if user is None:
+			print("User none")
 			return
 
+		print("2222")
 		if isinstance(user, LocalProxy):
 			user = user._get_current_object()
 
+		print("333")
 		if not isinstance(user, User):
+			print("not instance")
 			return None
 
+		print("444")
 		if not isinstance(user, SessionUser):
 			user = SessionUser(user)
 
 		self._session_users_by_session[user.session] = user
 
 		userid = user.get_id()
+		print("userid = " + userid)
 		if not userid in self._sessionids_by_userid:
 			self._sessionids_by_userid[userid] = set()
 
 		self._sessionids_by_userid[userid].add(user.session)
 		logging.getLogger("octoprint.plugins." + __name__).info("#######6666 - My login ######")
+		print("MYLOGIN2")
 
 		self._logger.debug("Logged in user: %r" % user)
 

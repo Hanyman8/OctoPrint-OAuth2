@@ -14,24 +14,41 @@ import yaml
 
 class HelloWorldPlugin(octoprint.plugin.StartupPlugin,
 					   octoprint.plugin.TemplatePlugin,
-					   octoprint.plugin.OctoPrintPlugin):
+					   octoprint.plugin.SettingsPlugin,
+					   octoprint.plugin.AssetPlugin
+					   ):
 	def on_after_startup(self):
 		self._logger.info("############# Hello World FIT OAuth 0003!")
+		self._logger.info("Mistr hanus vice na: %s" %self._settings.get(["url"]))
 
-	# hooks = self._plugin_manager.get_hooks("octoprint.plugin.octoprint_oauthfit")
-	# for name, hook in hooks.items():
-	#	hook()
 
+	# Settings plugin mixin
+	def get_settings_defaults(self):
+		self._logger.info("####### getting settings 44444")
+		return dict(url="https://en.wikipedia.org/wiki/Hello_world")
+
+	# def get_template_vars(self):
+	# 	return dict(url=self._settings.get(["url"]))
+
+	# Template plugin mixin
 	def get_template_configs(self):
 		self._logger.info("************ Template configs *************")
 		return [
-			dict(type="navbar", template="oauthfit_login.jinja2", replaces="login"),
-			dict(type="navbar", template="oauthfit_name.jinja2")
+			dict(type="navbar", template="oauthfit_login.jinja2", custom_bindings=False),
+			dict(type="navbar", template="oauthfit_name.jinja2"),
+			dict(type="navbar", custom_bindings=False),
+			dict(type="settings", custom_bindings=False)
 		]
 
-	# def on_after_startup(self):
-	#	self._logger.info("############### Order Test Plugin: StartupPlugin.on_after_startup called")
 
+	# Asset plugin mixin
+
+	def get_assets(self):
+		self._logger.info("****** getting Assets ******")
+		return dict(
+			js=["js/oauthfit.js"],
+			css=["css/oauthfit.css"]
+		)
 
 def user_factory_hook(components, settings, *args, **kwargs):
 	logging.getLogger("octoprint.plugins." + __name__).info("#######111111######")
