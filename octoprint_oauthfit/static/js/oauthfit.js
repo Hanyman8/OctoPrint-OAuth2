@@ -24,6 +24,49 @@ $(function() {
            }
         });
 
+        self.loginState.login = function (u, p, r) {
+            var username = u || self.loginState.loginUser();
+            var password = p || self.loginState.loginPass();
+            var remember = (r != undefined ? r : self.loginState.loginRemember());
+
+            return OctoPrint.browser.login(username, password, remember)
+                .done(function (response) {
+                    new PNotify({
+                        title: gettext("Login OK"),
+                        text: _.sprintf(gettext('OAuth Logged as "%(username)s"'),
+                            {username: response.name}), type:"success"});
+                    self.loginState.fromResponse(response);
+                    self.loginState.loginUser("");
+                    self.loginState.loginPass("");
+                    self.loginState.loginRemember(false);
+
+                    if (history && history.replaceState) {
+                        history.replaceState({success: true}, document.title, window.location.pathname);
+                    }
+                })
+                .fail(function(response) {
+                    switch(response.status) {
+                        case 401: {
+                            new PNotify({
+                                title: gettext("Login failed"),
+                                text: gettext("User unknown or wrong password"),
+                                type: "error"
+                            });
+                            break;
+                        }
+                        case 403: {
+                            new PNotify({
+                                title: gettext("Login failed"),
+                                text: gettext("Your account is deactivated"),
+                                type: "error"
+                            });
+                            break;
+                        }
+                    }
+                });
+
+        };
+
         // this will hold the URL currently displayed by the iframe
         self.currentUrl = ko.observable();
 
