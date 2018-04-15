@@ -19,13 +19,15 @@
         <input type="text" class="form-control" id="login_user" name="username" data-bind="valueWithInit: loginState.loginUser" placeholder="{{ _('Username_FITAUTH') }}" autocapitalize="none" autocorrect="off">
         <label for="login_pass">{{ _('Password') }}</label>
         <input type="password" class="form-control" id="login_pass" name="password" data-bind="valueWithInit: loginState.loginPass" placeholder="{{ _('Password_FITAUTH') }}">
-        <label class="checkbox">
-            <input type="checkbox" id="login_remember" data-bind="checked: loginState.loginRemember"> {{ _('Remember me') }}
-        </label>
+
         <button type="submit" class="btn btn-block btn-primary" id="login_button">{{ _('Login') }}</button>
         <li role="presentation" class="divider"></li>
         test
-        <form id="loginFormOAuth">test</form>
+        <button class="btn btn-primary btn-block" type="button" id="oauth_login">{{ _('Login via OAuth') }}</button>
+        <li role="presentation" class="divider"></li>
+        <label class="checkbox">
+            <input type="checkbox" id="login_remember" data-bind="checked: loginState.loginRemember"> {{ _('Remember me') }}
+        </label>
     </form>
 
 </div>

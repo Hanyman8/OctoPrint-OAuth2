@@ -4,7 +4,7 @@ $(function() {
 
 
 
-        $(".dropdown-menu input").click(function (e) {
+        $(".dropdown-menu").click(function (e) {
             e.stopPropagation();
         });
 
@@ -38,6 +38,9 @@ $(function() {
             self.currentUrl(self.newUrl());
         };
 
+        self.onStartup = function () {
+            self.elementOAuthLogin = $("#oauth_login");
+        }
 
 
         // This will get called before the HelloWorldViewModel gets bound to the DOM, but after its
