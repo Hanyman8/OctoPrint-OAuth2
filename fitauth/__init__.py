@@ -67,11 +67,7 @@ def make_authorization_url():
     # Save it for use later to prevent xsrf attacks
     from uuid import uuid4
     state = str(uuid4())
-    save_created_state(state)
-    params = {"response_type": "code",
-              "client_id": CLIENT_ID,
-              "redirect_uri": REDIRECT_URI,
-              "state": state}
+    params = {"response_type": "code", "client_id": CLIENT_ID, "redirect_uri": REDIRECT_URI, "state": state}
     url = "https://auth.fit.cvut.cz/oauth/authorize?" + urllib.urlencode(params)
    # print(url)
     return url

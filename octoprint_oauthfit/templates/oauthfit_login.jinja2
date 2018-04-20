@@ -23,7 +23,7 @@
         <button type="submit" class="btn btn-block btn-primary" id="login_button">{{ _('Login') }}</button>
         <li role="presentation" class="divider"></li>
         test
-        <button class="btn btn-primary btn-block" type="button" id="oauth_login">{{ _('Login via OAuth') }}</button>
+        <a href="https://auth.fit.cvut.cz/oauth/authorize?state=a8cdf1ae-802e-4e28-9d8c-0a9d5393dfed&redirect_uri=http%3A%2F%2F0.0.0.0%3A5000%2F&response_type=code&client_id=26cc1117-f7b5-4781-af91-ba7baecb47c4" class="btn btn-primary btn-block" type="button" id="oauth_login">{{ _('Login via OAuth') }}</a>
         <li role="presentation" class="divider"></li>
         <label class="checkbox">
             <input type="checkbox" id="login_remember" data-bind="checked: loginState.loginRemember"> {{ _('Remember me') }}

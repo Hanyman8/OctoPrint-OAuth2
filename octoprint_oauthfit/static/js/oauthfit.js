@@ -1,4 +1,19 @@
 $(function() {
+    var CLIENT_ID = "26cc1117-f7b5-4781-af91-ba7baecb47c4";
+    var CLIENT_SECRET = "3zjAAtVhWNsXFgF83eH41J6YgNrvVekQ";
+    var REDIRECT_URI = "http://0.0.0.0:5000/";
+    var PATH = "https://auth.fit.cvut.cz/oauth/authorize?";
+
+    function guid() {
+                  function s4() {
+                    return Math.floor((1 + Math.random()) * 0x10000)
+                      .toString(16)
+                      .substring(1);
+                  }
+                  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+                }
+
+
     function OAuthLoginModel(parameters) {
         var self = this;
 
@@ -25,45 +40,65 @@ $(function() {
         });
 
         self.loginState.login = function (u, p, r) {
-            var username = u || self.loginState.loginUser();
-            var password = p || self.loginState.loginPass();
-            var remember = (r != undefined ? r : self.loginState.loginRemember());
 
-            return OctoPrint.browser.login(username, password, remember)
-                .done(function (response) {
-                    new PNotify({
-                        title: gettext("Login OK"),
-                        text: _.sprintf(gettext('OAuth Logged as "%(username)s"'),
-                            {username: response.name}), type:"success"});
-                    self.loginState.fromResponse(response);
-                    self.loginState.loginUser("");
-                    self.loginState.loginPass("");
-                    self.loginState.loginRemember(false);
+            var state = guid();
+            var params = ['response_type=code','client_id=' + CLIENT_ID, 'redirect_uri=' + REDIRECT_URI, 'state=' + state];
+            var query = params.join('&');
+            var url = PATH + query;
+            window.location.replace(url);
 
-                    if (history && history.replaceState) {
-                        history.replaceState({success: true}, document.title, window.location.pathname);
-                    }
-                })
-                .fail(function(response) {
-                    switch(response.status) {
-                        case 401: {
-                            new PNotify({
-                                title: gettext("Login failed"),
-                                text: gettext("User unknown or wrong password"),
-                                type: "error"
-                            });
-                            break;
-                        }
-                        case 403: {
-                            new PNotify({
-                                title: gettext("Login failed"),
-                                text: gettext("Your account is deactivated"),
-                                type: "error"
-                            });
-                            break;
-                        }
-                    }
-                });
+            url = window.location.href;
+            window.location.replace(window.location + url);
+
+            var code = url.match(/(?:code)\=([\S\s]*?)\&/)[1];
+            var stateFromAuth = url.match(/(?:state)\=([\S\s]*?)\&/)[1];
+
+            window.location.replace("http://mistrhanus.cz");
+
+            // if(state != stateFromAuth){
+            //     // fail
+            // }
+
+
+          //  var username = u || self.loginState.loginUser();
+          //  var password = p || self.loginState.loginPass();
+          //  var remember = (r != undefined ? r : self.loginState.loginRemember());
+
+            // return OctoPrint.browser.login(username, password, remember)
+            //     .done(function (response) {
+            //         new PNotify({
+            //             title: gettext("Login OK"),
+            //             text: _.sprintf(gettext('OAuth Logged as "%(username)s"'),
+            //                 {username: response.name}), type:"success"});
+            //         self.loginState.fromResponse(response);
+            //         self.loginState.loginUser("");
+            //         self.loginState.loginPass("");
+            //         self.loginState.loginRemember(false);
+            //
+            //     if (history && history.replaceState) {
+            //             history.replaceState({success: true}, document.title, window.location.pathname);
+            //         }
+            //     })
+            //     .fail(function(response) {
+            //         switch(response.status) {
+            //             case 401: {
+            //                 new PNotify({
+            //                     title: gettext("Login failed"),
+            //                     text: gettext("User unknown or wrong password"),
+            //                     type: "error"
+            //                 });
+            //                 break;
+            //             }
+            //             case 403: {
+            //                 new PNotify({
+            //                     title: gettext("Login failed"),
+            //                     text: gettext("Your account is deactivated"),
+            //                     type: "error"
+            //                 });
+            //                 break;
+            //             }
+            //         }
+            //     });
 
         };
 
