@@ -73,12 +73,6 @@ def make_authorization_url():
     return url
 
 
-# Left as an exercise to the reader.
-# You may want to store valid states in a database or memcache,
-# or perhaps cryptographically sign them and verify upon retrieval.
-def save_created_state(state):
-    pass
-
 
 def is_valid_state(state):
     return True
