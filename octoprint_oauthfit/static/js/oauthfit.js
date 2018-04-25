@@ -50,15 +50,15 @@ $(function() {
 
         var code = getParameterByName("code",window.location.href);
         var stateFromOAuth = getParameterByName("state", window.location.href);
-        var remember = true; // tmp true
+        //var remember = true; // tmp true
 
         if(!!stateFromOAuth && !!code){
             window.alert("cond ok, state=" + stateFromOAuth + "   code=" + code);
             var tmp = window.location.host;
-            window.alert(tmp);
+           // window.alert(tmp);
 
 
-            OctoPrint.browser.login(code, stateFromOAuth, remember)
+            OctoPrint.browser.login(code, stateFromOAuth, false)
                 .done(function (response) {
                     new PNotify({
                         title: gettext("Login OK"),
@@ -111,7 +111,7 @@ $(function() {
             var url = PATH + query;
             var href = window.location.href;
 
-            window.alert("0000");
+          //  window.alert("0000");
 
             window.location.replace(url);
 

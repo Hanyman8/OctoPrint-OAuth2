@@ -1,34 +1,94 @@
-
 from octoprint.users import *
+import requests
+import requests.auth
+import urllib, json
+
+CLIENT_ID = "26cc1117-f7b5-4781-af91-ba7baecb47c4"
+CLIENT_SECRET = "3zjAAtVhWNsXFgF83eH41J6YgNrvVekQ"
+REDIRECT_URI = "http://0.0.0.0:5000/"
+username=""
+
+
+def get_token(code):
+	client_auth = requests.auth.HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
+	post_data = {"grant_type": "authorization_code",
+				 "code": code,
+				 "redirect_uri": REDIRECT_URI}
+	response = requests.post("https://auth.fit.cvut.cz/oauth/token",
+							 auth=client_auth,
+							 data=post_data)
+	token_json = response.json()
+
+	print(token_json)
+
+	return token_json["access_token"]
+
+
+def get_username(access_token):
+	params = {
+		'token': access_token
+	}
+	url = 'https://auth.fit.cvut.cz/oauth/api/v1/tokeninfo?' + urllib.urlencode(params)
+	print("=====1111====" + url)
+	response = urllib.urlopen(url)
+	data = json.loads(response.read())
+
+	print("-------------------------")
+	print(data)
+	print("-----------2222----------")
+	print(data["user_id"])
+
+	return data["user_id"]
 
 
 class OAuthbasedUserManager(FilebasedUserManager):
 	def __init__(self):
-
 		logging.getLogger("octoprint.plugins." + __name__).info("#######2222######")
 		FilebasedUserManager.__init__(self)
 
+	def logout_user(self, user):
+		global username
+		username = ""
+		print(">>>>>>>>My logout")
+		UserManager.logout_user(self, user)
 
 	def login_user(self, user):
+		global username
 		self._cleanup_sessions()
 
 		logging.getLogger("octoprint.plugins." + __name__).info("#######5555 - My login ######")
 		print(" MY LOGIN user = ")
+
+		tokenGot = False
+
 		if user is None:
 			print("User none")
 			return
 
-		print("2222")
 		if isinstance(user, LocalProxy):
+			print("is instance of localProxy")
 			user = user._get_current_object()
 
 		print("333")
 		if not isinstance(user, User):
-			print("not instance")
+			print("not instance of User")
 			return None
 
-		print("444")
+		print("code = " + user.get_id() + "    " + user.get_name())
+		print("username = " + username)
+
+		if username == "":
+			print ("NEW USER--------")
+			code = user.get_id()
+			print ("logincode = " + code)
+			access_token = get_token(code)
+			# admin role tmp
+			username = get_username(access_token)
+			print(username)
+			user = User(username, "", True, "admin")
+
 		if not isinstance(user, SessionUser):
+			print("444")
 			user = SessionUser(user)
 
 		self._session_users_by_session[user.session] = user
@@ -58,14 +118,67 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		self._save()
 
 	def checkPassword(self, username, password):
-		print("Checking password")
-		user = self.findUser(username)
-		if not user:
-			print("Not user")
-			return False
+		print("Logging in via OAuth")
+		# print("username = " + username + "    pass = " + password)
+		#
+		# code = username
+		# state = password
+		#
+		# access_token = get_token(code)
+		# print("Your name is: %s" % get_username(access_token))
 
-		if user.check_password(password):
-			# new hash matches, correct password
-			return True
-		else:
-			return False
+		return True
+
+	#
+
+	# user = self.findUser(username)
+	# if not user:
+	# 	print("Not user")
+	# 	return False
+	#
+	# if user.check_password(password):
+	# 	# new hash matches, correct password
+	# 	return True
+	# else:
+	# 	return False
+
+	def findUser(self, userid=None, apikey=None, session=None):
+
+		# # making temporary user because of implementation of api
+		#
+		# if userid is not None:
+		# 	print("userid=code= " + userid)
+		#
+		# 	code = userid
+		#
+		# 	access_token = get_token(code)
+		#
+		# 	username = get_username(access_token)
+		#
+		# 	# is admin? into settings
+
+		user = User(userid, "", 1, "admin")
+		# else:
+		# 	return None
+
+		# print("My find user" + username)
+		#	tmp = "tmp"
+
+		return user
+
+	# if user is not None:
+	# 	return user
+	#
+	# if userid is not None:
+	# 	if userid not in self._users.keys():
+	# 		return None
+	# 	return self._users[userid]
+	#
+	# elif apikey is not None:
+	# 	for user in self._users.values():
+	# 		if apikey == user._apikey:
+	# 			return user
+	# 	return None
+	#
+	# else:
+	# 	return None
