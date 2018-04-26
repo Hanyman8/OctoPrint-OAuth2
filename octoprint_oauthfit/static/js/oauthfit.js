@@ -1,9 +1,9 @@
 $(function() {
-    var CLIENT_ID = "26cc1117-f7b5-4781-af91-ba7baecb47c4";
-    var CLIENT_SECRET = "3zjAAtVhWNsXFgF83eH41J6YgNrvVekQ";
+    var CLIENT_ID = "1cb4ca8a2734ba9723ff";
+    var CLIENT_SECRET = "678089f05cb59c524febf431e00837bb8f70a01d";
     var REDIRECT_URI = "http://0.0.0.0:5000/";
-    var PATH = "https://auth.fit.cvut.cz/oauth/authorize?";
-
+    // var PATH = "https://auth.fit.cvut.cz/oauth/authorize?";
+    var PATH = "https://github.com/login/oauth/authorize?";
     function guid() {
       function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
