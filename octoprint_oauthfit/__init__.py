@@ -10,9 +10,7 @@ import yaml
 # stream = open(config, 'r')
 # data = yaml.load(stream)
 
-
-
-class HelloWorldPlugin(octoprint.plugin.StartupPlugin,
+class OAuthFITPlugin(octoprint.plugin.StartupPlugin,
 					   octoprint.plugin.TemplatePlugin,
 					   octoprint.plugin.SettingsPlugin,
 					   octoprint.plugin.AssetPlugin
@@ -28,6 +26,7 @@ class HelloWorldPlugin(octoprint.plugin.StartupPlugin,
 		return dict(url="https://en.wikipedia.org/wiki/Hello_world")
 
 	# def get_template_vars(self):
+	# 	self._logger.info("######## get template vars")
 	# 	return dict(url=self._settings.get(["url"]))
 
 	# Template plugin mixin
@@ -36,8 +35,8 @@ class HelloWorldPlugin(octoprint.plugin.StartupPlugin,
 		return [
 			dict(type="navbar", template="oauthfit_login.jinja2", custom_bindings=False, replaces="login"),
 			# dict(type="navbar", template="oauthfit_name.jinja2", custom_bindings=False),
-			# dict(type="navbar", custom_bindings=True),
-			dict(type="settings", custom_bindings=True)
+			dict(type="navbar", custom_bindings=False),
+			dict(type="settings", custom_bindings=False)
 		]
 
 
@@ -52,11 +51,11 @@ class HelloWorldPlugin(octoprint.plugin.StartupPlugin,
 
 def user_factory_hook(components, settings, *args, **kwargs):
 	logging.getLogger("octoprint.plugins." + __name__).info("#######111111######")
-	return OAuthbasedUserManager()
+	return OAuthbasedUserManager(components, settings)
 
 
 __plugin_name__ = "OAuth"
-__plugin_implementation__ = HelloWorldPlugin()
+__plugin_implementation__ = OAuthFITPlugin()
 __plugin_hooks__ = {
 	"octoprint.users.factory": user_factory_hook
 }

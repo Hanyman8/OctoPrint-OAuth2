@@ -1,9 +1,12 @@
 $(function() {
+
     var CLIENT_ID = "1cb4ca8a2734ba9723ff";
     var CLIENT_SECRET = "678089f05cb59c524febf431e00837bb8f70a01d";
     var REDIRECT_URI = "http://0.0.0.0:5000/";
     // var PATH = "https://auth.fit.cvut.cz/oauth/authorize?";
     var PATH = "https://github.com/login/oauth/authorize?";
+    var PROVIDER = "https://github.com";
+
     function guid() {
       function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -53,7 +56,7 @@ $(function() {
         //var remember = true; // tmp true
 
         if(!!stateFromOAuth && !!code){
-            window.alert("cond ok, state=" + stateFromOAuth + "   code=" + code);
+          //  window.alert("cond ok, state=" + stateFromOAuth + "   code=" + code);
             var tmp = window.location.host;
            // window.alert(tmp);
 
@@ -114,12 +117,28 @@ $(function() {
           //  window.alert("0000");
 
             window.location.replace(url);
+        };
+
+        self.loginState.logout = function() {
+            return OctoPrint.browser.logout()
+                .done(function(response) {
+
+                    new PNotify({title: gettext("Logout from OctoPrint successful"), text: gettext("You are now logged out"), type: "success"});
+                    new PNotify({title: gettext("OAuth Logout"), text: gettext("To log out completely, make sure to log out from OAuth provider: " + PROVIDER), hide: false});
+
+                    self.loginState.fromResponse(response);
+                })
+                .error(function(error) {
+                    if (error && error.status === 401) {
+                         self.loginState.fromResponse(false);
+                    }
+                });
+        };
 
 
-        }
 
 
-    };
+    }
 
     // this will hold the URL currently displayed by the iframe
     self.currentUrl = ko.observable();
