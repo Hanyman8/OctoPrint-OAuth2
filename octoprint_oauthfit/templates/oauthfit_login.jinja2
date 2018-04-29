@@ -9,25 +9,13 @@
 {#, data-toggle="dropdown"#}
 
 <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
-    <i class="fa fa-user"></i> <span data-bind="text: loginState.userMenuText, attr: {title: loginState.userMenuTitle}">{{ _('OAUTH_Login22') }}</span>
+    <i class="fa fa-user"></i> <span data-bind="text: loginState.userMenuText, attr: {title: loginState.userMenuTitle}">{{ _('OAUTH_Login') }}</span>
     <b class="caret"></b>
 </a>
 
 <div id="login_dropdown_loggedout" style="padding: 15px" class="dropdown-menu" data-bind="css: {hide: loginState.loggedIn(), 'dropdown-menu': !loginState.loggedIn()}">
     <form id="loginForm" class="form-horizontal" role="form" data-bind="event: {'submit': loginState.prepareLogin }">
-        <label for="login_user">{{ _('Username') }}</label>
-        <input type="text" class="form-control" id="login_user" name="username" data-bind="valueWithInit: loginState.loginUser" placeholder="{{ _('Username_FITAUTH') }}" autocapitalize="none" autocorrect="off">
-        <label for="login_pass">{{ _('Password') }}</label>
-        <input type="password" class="form-control" id="login_pass" name="password" data-bind="valueWithInit: loginState.loginPass" placeholder="{{ _('Password_FITAUTH') }}">
-
-        <button type="submit" class="btn btn-block btn-primary" id="login_button">{{ _('Login') }}</button>
-        <li role="presentation" class="divider"></li>
-        test
-        <a href="https://auth.fit.cvut.cz/oauth/authorize?state=a8cdf1ae-802e-4e28-9d8c-0a9d5393dfed&redirect_uri=http%3A%2F%2F0.0.0.0%3A5000%2F&response_type=code&client_id=26cc1117-f7b5-4781-af91-ba7baecb47c4" class="btn btn-primary btn-block" type="button" id="oauth_login">{{ _('Login via OAuth') }}</a>
-        <li role="presentation" class="divider"></li>
-        <label class="checkbox">
-            <input type="checkbox" id="login_remember" data-bind="checked: loginState.loginRemember"> {{ _('Remember me') }}
-        </label>
+        <button type="submit" class="btn btn-block btn-primary" id="login_button">{{ _('Login via OAuth') }}</button>
     </form>
 
 </div>

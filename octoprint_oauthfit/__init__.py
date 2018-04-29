@@ -23,7 +23,7 @@ class OAuthFITPlugin(octoprint.plugin.StartupPlugin,
 	# Settings plugin mixin
 	def get_settings_defaults(self):
 		self._logger.info("####### getting settings 44444")
-		return dict(url="https://en.wikipedia.org/wiki/Hello_world")
+		return dict(redirect_uri="http://0.0.0.0:5000/" ,client_id="1cb4ca8a2734ba9723ff", client_secret="678089f05cb59c524febf431e00837bb8f70a01d")
 
 	# def get_template_vars(self):
 	# 	self._logger.info("######## get template vars")
@@ -34,8 +34,6 @@ class OAuthFITPlugin(octoprint.plugin.StartupPlugin,
 		self._logger.info("************ Template configs *************")
 		return [
 			dict(type="navbar", template="oauthfit_login.jinja2", custom_bindings=False, replaces="login"),
-			# dict(type="navbar", template="oauthfit_name.jinja2", custom_bindings=False),
-			dict(type="navbar", custom_bindings=False),
 			dict(type="settings", custom_bindings=False)
 		]
 
