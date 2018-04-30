@@ -17,7 +17,7 @@ class OAuthFITPlugin(octoprint.plugin.StartupPlugin,
 					   ):
 	def on_after_startup(self):
 		self._logger.info("############# Hello World FIT OAuth 0003!")
-		self._logger.info("Mistr hanus vice na: %s" %self._settings.get(["url"]))
+		# self._logger.info("Mistr hanus vice na: %s" %self._settings.get(["url"]))
 
 
 	# Settings plugin mixin

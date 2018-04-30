@@ -5,35 +5,19 @@ import requests
 import requests.auth
 import urllib, json
 
-import pprint
-
-# CLIENT_ID = octoprint.plugin.plugin_settings_for_settings_plugin("oauthfit",)
-# print(CLIENT_ID)
-
-# SETTINGS = octoprint.settings.Settings.get(["plugins"])
-
-PATH_FOR_TOKEN = "https://github.com/login/oauth/access_token"
-HEADERS_FOR_TOKEN = {'Accept': 'application/json'}
-PATH_USER_INFO = "https://api.github.com/user?access_token="
-
-
-# "https://auth.fit.cvut.cz/oauth/token"
-# token info ttps://api.github.com/user?access_token=
-# https://auth.fit.cvut.cz/oauth/api/v1/tokeninfo?
-
 
 class OAuthbasedUserManager(FilebasedUserManager):
 	def __init__(self, components, settings):
 		logging.getLogger("octoprint.plugins." + __name__).info("#######2222######")
-		# print("client ID ==========" + CLIENT_ID)
-		self.components = components
+		self._components = components
 		self._settings = settings
 		self.CLIENT_ID = self._settings.get(["plugins","oauthfit","client_id"])
 		self.CLIENT_SECRET = self._settings.get(["plugins", "oauthfit", "client_secret"])
 		self.REDIRECT_URI = self._settings.get(["plugins", "oauthfit", "redirect_uri"])
-		# print(self.CLIENT_ID)
-		# pprint.pprint(self._settings.get(["plugins"]))
-		# print("CLient IS = " + self.CLIENT_ID)
+		self.PATH_FOR_TOKEN = self._settings.get(["plugins", "oauthfit", "token_path"])
+		self.PATH_USER_INFO = self._settings.get(["plugins", "oauthfit", "user_path_info"])
+		self.USERNAME = self._settings.get(["plugins", "oauthfit", "username"])
+		self.TOKEN_HEADERS = self._settings.get(["plugins", "oauthfit", "token_headers"])
 		FilebasedUserManager.__init__(self)
 
 	def logout_user(self, user):
@@ -42,25 +26,19 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 	def get_token(self, code):
 
-		print("ID = " + self.CLIENT_ID)
-		print("SECRET = " + self.CLIENT_SECRET)
-
 		client_auth = requests.auth.HTTPBasicAuth(self.CLIENT_ID, self.CLIENT_SECRET)
 		post_data = {"grant_type": "authorization_code",
 					 "code": code,
 					 "redirect_uri": self.REDIRECT_URI
 					 }  # json required
 
-		response = requests.post(PATH_FOR_TOKEN,
+
+		response = requests.post(self.PATH_FOR_TOKEN,
 								 auth=client_auth,
 								 data=post_data,
-								 headers=HEADERS_FOR_TOKEN)
-
-		print (response.text)
+								 headers=self.TOKEN_HEADERS)
 
 		token_json = response.json()
-
-		print(token_json)
 
 		try:
 			# token is OK
@@ -76,12 +54,8 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		return None
 
 	def get_username(self, access_token):
-		params = {
-			'token': access_token
-		}
 
-		url = PATH_USER_INFO + access_token
-		# print("=====1111====" + url)
+		url = self.PATH_USER_INFO + access_token
 		response = urllib.urlopen(url)
 		data = json.loads(response.read())
 
@@ -95,51 +69,36 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		return None
 
 	def login_user(self, user):
+
 		self._cleanup_sessions()
 
-		logging.getLogger("octoprint.plugins." + __name__).info("#######5555 - My login ######")
-		# pprint.pprint(SETTINGS)
-		# print(SETTINGS)
-		# pprint.pprint(self._settings.serial)
-		print(" MY LOGIN user ")
-
 		if user is None:
-			print("User none")
 			return
 
 		# LocalProxy.
 
 		if isinstance(user, LocalProxy):
-			print("is instance of localProxy")
 			user = user._get_current_object()
 			return user
 
-		print("333")
 		if not isinstance(user, User):
-			print("not instance of User")
 			return None
 
-		# print("code = " + user.get_id() + "    " + user.get_name())
 
 		if not isinstance(user, SessionUser):
-			# print ("NEW USER--------")
 			code = user.get_id()
-			print ("logincode = " + code)
 			access_token = self.get_token(code)
-
-			print("Access_token = ")
-			print(access_token)
 
 			if access_token is None:
 				return None
 
-			# admin role tmp
 			username = self.get_username(access_token)
-			# print("adding user=" + username)
-			# todo funtion for recognize admin
-			user = User(username, "", True, "admin")
+			user = FilebasedUserManager.findUser(self,username)
 
-		# print("444 token = " + self.tokens[username])
+			if user is None:
+				self.addUser(username, "", True, ["user"])
+				user = self.findUser(username)
+
 
 		if not isinstance(user, SessionUser):
 			user = SessionUser(user)
@@ -147,16 +106,10 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		self._session_users_by_session[user.session] = user
 
 		userid = user.get_id()
-		# print("userid = " + userid)
 		if not userid in self._sessionids_by_userid:
 			self._sessionids_by_userid[userid] = set()
 
 		self._sessionids_by_userid[userid].add(user.session)
-		logging.getLogger("octoprint.plugins." + __name__).info("#######6666 - OAuth login ######")
-		# print("MYLOGIN2")
-
-		self._logger.debug("Logged in user: %r" % user)
-
 		return user
 
 	def addUser(self, username, password, active=False, roles=None, apikey=None, overwrite=False):
@@ -176,6 +129,12 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 	def findUser(self, userid=None, apikey=None, session=None):
 
+		user = FilebasedUserManager.findUser(self, userid, apikey, session)
+		if user is not None:
+			return user
+
 		# making temporary user because of implementation of api
-		user = User(userid, "", 1, "admin")
+		# and we need to pass our code from OAuth to login_user
+		# api login could be found in server/api/__init__.py
+		user = User(userid, "", 1, ["user"])
 		return user

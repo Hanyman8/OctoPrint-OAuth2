@@ -1,9 +1,6 @@
 var glob;
 $(function() {
 
-    var PATH = "https://github.com/login/oauth/authorize?";
-    var PROVIDER = "https://github.com";
-
     function guid() {
       function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -102,14 +99,16 @@ $(function() {
 
             var client_id = oauth_plugin_settings.client_id();
             var redirect_uri = oauth_plugin_settings.redirect_uri();
+            var login_path = oauth_plugin_settings.login_path();
 
             console.log("client id = " + client_id + "    redirect =" +redirect_uri);
 
+            // persistent browser storage pro ulozeni state
             var state = guid();
 
             var params = ['response_type=code', 'client_id=' + client_id, 'redirect_uri=' + redirect_uri, 'state=' + state];
             var query = params.join('&');
-            var url = PATH + query;
+            var url = login_path + query;
             var href = window.location.href;
 
           //  window.alert("0000");
@@ -118,11 +117,15 @@ $(function() {
         };
 
         self.loginState.logout = function() {
+            var parser = document.createElement('a');
+            parser.href = self.settings.settings.plugins.oauthfit.login_path();
+            var provider = parser.host;
+
             return OctoPrint.browser.logout()
                 .done(function(response) {
 
                     new PNotify({title: gettext("Logout from OctoPrint successful"), text: gettext("You are now logged out"), type: "success"});
-                    new PNotify({title: gettext("OAuth Logout"), text: gettext("To log out completely, make sure to log out from OAuth provider: " + PROVIDER), hide: false});
+                    new PNotify({title: gettext("OAuth Logout"), text: gettext("To log out completely, make sure to log out from OAuth provider: " + provider), hide: false});
 
                     self.loginState.fromResponse(response);
                 })
@@ -155,16 +158,18 @@ $(function() {
     };
 
 
-    // This will get called before the HelloWorldViewModel gets bound to the DOM, but after its
+
+
+    // This will get called before the OAuthViewModel gets bound to the DOM, but after its
     // dependencies have already been initialized. It is especially guaranteed that this method
     // gets called _after_ the settings have been retrieved from the OctoPrint backend and thus
     // the SettingsViewModel been properly populated.
     self.onBeforeBinding = function() {
         self.newUrl(self.settings.settings.plugins.oauthfit.url());
-        var tmp3 = self.settings.requestData();
-        alert("tmp3 = "+ tmp3);
-        console.log(JSON.stringify(tmp3, null, 4));
-        alert(JSON.stringify(tmp3, null, 4));
+        // var tmp3 = self.settings.requestData();
+        // alert("tmp3 = "+ tmp3);
+        // console.log(JSON.stringify(tmp3, null, 4));
+        // alert(JSON.stringify(tmp3, null, 4));
     };
 
 

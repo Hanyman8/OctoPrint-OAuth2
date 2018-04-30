@@ -1,27 +1,71 @@
-<form class="form-horizontal">
-    <div class="control-group">
-        <label class="control-label">{{ _('CLIENT_ID') }}</label>
-        <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.oauthfit.client_id">
-        </div>
-    </div>
-</form>
-
-<form class="form-horizontal">
-    <div class="control-group">
-        <label class="control-label">{{ _('CLIENT_SECRET') }}</label>
-        <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.oauthfit.client_secret">
-        </div>
-    </div>
-</form>
-
-<form class="form-horizontal">
-    <div class="control-group">
-        <label class="control-label">{{ _('REDIRECT_URI') }}</label>
-        <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.oauthfit.redirect_uri">
-        </div>
-    </div>
-</form>
-
+{#<form class="form-horizontal">#}
+{#    <div class="control-group">#}
+{#        <label class="control-label">{{ _('Client ID:') }}</label>#}
+{#        <div class="controls">#}
+{#            <input type="text" class="input-block-level" data-bind="value: settings.plugins.oauthfit.client_id">#}
+{#        </div>#}
+{#    </div>#}
+{#</form>#}
+{##}
+{#<form class="form-horizontal">#}
+{#    <div class="control-group">#}
+{#        <label class="control-label">{{ _('Client Secret:') }}</label>#}
+{#        <div class="controls">#}
+{#            <input type="text" class="input-block-level" data-bind="value: settings.plugins.oauthfit.client_secret">#}
+{#        </div>#}
+{#    </div>#}
+{#</form>#}
+{##}
+{#<form class="form-horizontal">#}
+{#    <div class="control-group">#}
+{#        <label class="control-label">{{ _('Redirect URI/Callback: ') }}</label>#}
+{#        <div class="controls">#}
+{#            <input type="text" class="input-block-level" data-bind="value: settings.plugins.oauthfit.redirect_uri">#}
+{#        </div>#}
+{#    </div>#}
+{#</form>#}
+{##}
+{#<form class="form-horizontal">#}
+{#    <div class="control-group">#}
+{#        <label class="control-label">{{ _('Path for token: ') }}</label>#}
+{#        <div class="controls">#}
+{#            <input type="text" class="input-block-level" data-bind="value: settings.plugins.oauthfit.token_path">#}
+{#        </div>#}
+{#    </div>#}
+{#</form>#}
+{##}
+{#<form class="form-horizontal">#}
+{#    <div class="control-group">#}
+{#        <label class="control-label">{{ _('Path for user info: ') }}</label>#}
+{#        <div class="controls">#}
+{#            <input type="text" class="input-block-level" data-bind="value: settings.plugins.oauthfit.user_path_info">#}
+{#        </div>#}
+{#    </div>#}
+{#</form>#}
+{##}
+{#<form class="form-horizontal">#}
+{#    <div class="control-group">#}
+{#        <label class="control-label">{{ _('Headers for token: ') }}</label>#}
+{#        <div class="controls">#}
+{#            <input type="text" class="input-block-level" data-bind="value: settings.plugins.oauthfit.token_headers.$data">#}
+{#        </div>#}
+{#    </div>#}
+{#</form>#}
+{##}
+{#<form class="form-horizontal">#}
+{#    <div class="control-group">#}
+{#        <label class="control-label">{{ _('Headers for token: ') }}</label>#}
+{#        test#}
+{#        <ul data-bind="foreach: settings.plugins.oauthfit.token_headers.$data">#}
+{#                <li>#}
+{#                    <div class="controls">#}
+{#                        Current item is = <b data-bind="text: $data"></b>#}
+{#                        <input type="text" class="input-block-level" data-bind="value: $data.value">#}
+{#                    </div>#}
+{#                </li>#}
+{#                <span type="text" data-bind="value: $data.value"></span>#}
+{#        </ul>#}
+{##}
+{#    </div>#}
+{#</form>#}
+{##}
