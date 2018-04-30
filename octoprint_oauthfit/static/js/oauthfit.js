@@ -43,7 +43,7 @@ $(function() {
                return self.loginState.username();
            }
            else {
-               return gettext("Login_from_model");
+               return gettext("Login via OAuth");
            }
         });
 

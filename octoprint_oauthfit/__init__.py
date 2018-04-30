@@ -21,9 +21,9 @@ class OAuthFITPlugin(octoprint.plugin.StartupPlugin,
 
 
 	# Settings plugin mixin
-	def get_settings_defaults(self):
-		self._logger.info("####### getting settings 44444")
-		return dict(redirect_uri="http://0.0.0.0:5000/" ,client_id="1cb4ca8a2734ba9723ff", client_secret="678089f05cb59c524febf431e00837bb8f70a01d")
+	# def get_settings_defaults(self):
+	# 	self._logger.info("####### getting settings 44444")
+	# 	return dict()
 
 	# def get_template_vars(self):
 	# 	self._logger.info("######## get template vars")

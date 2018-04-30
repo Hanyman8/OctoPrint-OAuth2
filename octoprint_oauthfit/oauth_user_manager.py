@@ -12,8 +12,6 @@ import pprint
 
 # SETTINGS = octoprint.settings.Settings.get(["plugins"])
 
-# CLIENT_ID = SETTINGS.get("plugins")
-
 PATH_FOR_TOKEN = "https://github.com/login/oauth/access_token"
 HEADERS_FOR_TOKEN = {'Accept': 'application/json'}
 PATH_USER_INFO = "https://api.github.com/user?access_token="
@@ -43,6 +41,10 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		UserManager.logout_user(self, user)
 
 	def get_token(self, code):
+
+		print("ID = " + self.CLIENT_ID)
+		print("SECRET = " + self.CLIENT_SECRET)
+
 		client_auth = requests.auth.HTTPBasicAuth(self.CLIENT_ID, self.CLIENT_SECRET)
 		post_data = {"grant_type": "authorization_code",
 					 "code": code,
@@ -54,18 +56,22 @@ class OAuthbasedUserManager(FilebasedUserManager):
 								 data=post_data,
 								 headers=HEADERS_FOR_TOKEN)
 
-		# print (response.text)
+		print (response.text)
 
 		token_json = response.json()
 
-		# print(token_json)
+		print(token_json)
 
 		try:
 			# token is OK
 			access_token = token_json["access_token"]
 			return access_token
 		except KeyError:
-			pass
+			try:
+				error = token_json["error"]
+				logging.getLogger("octoprint.plugins." + __name__).info("Error of access token: " + error)
+			except:
+				logging.getLogger("octoprint.plugins." + __name__).info("Error of access token, error message not found")
 
 		return None
 
@@ -120,6 +126,10 @@ class OAuthbasedUserManager(FilebasedUserManager):
 			code = user.get_id()
 			print ("logincode = " + code)
 			access_token = self.get_token(code)
+
+			print("Access_token = ")
+			print(access_token)
+
 			if access_token is None:
 				return None
 
