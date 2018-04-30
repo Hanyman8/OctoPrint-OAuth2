@@ -5,19 +5,22 @@ import requests
 import requests.auth
 import urllib, json
 
+import pprint
 
 class OAuthbasedUserManager(FilebasedUserManager):
 	def __init__(self, components, settings):
 		logging.getLogger("octoprint.plugins." + __name__).info("#######2222######")
 		self._components = components
 		self._settings = settings
-		self.CLIENT_ID = self._settings.get(["plugins","oauthfit","client_id"])
-		self.CLIENT_SECRET = self._settings.get(["plugins", "oauthfit", "client_secret"])
-		self.REDIRECT_URI = self._settings.get(["plugins", "oauthfit", "redirect_uri"])
-		self.PATH_FOR_TOKEN = self._settings.get(["plugins", "oauthfit", "token_path"])
-		self.PATH_USER_INFO = self._settings.get(["plugins", "oauthfit", "user_path_info"])
-		self.USERNAME = self._settings.get(["plugins", "oauthfit", "username"])
-		self.TOKEN_HEADERS = self._settings.get(["plugins", "oauthfit", "token_headers"])
+		self.oauthfit = self._settings.get(["plugins", "oauthfit"])
+		# pprint.pprint(self.oauthfit)
+		self.active_client = self.oauthfit["active_client"]
+		self.CLIENT_ID = self.oauthfit[self.active_client]["client_id"]
+		self.CLIENT_SECRET = self.oauthfit[self.active_client]["client_secret"]
+		self.REDIRECT_URI = self.oauthfit[self.active_client]["redirect_uri"]
+		self.PATH_FOR_TOKEN = self.oauthfit[self.active_client]["token_path"]
+		self.PATH_USER_INFO = self.oauthfit[self.active_client]["user_info_path"]
+		self.TOKEN_HEADERS = self.oauthfit[self.active_client]["token_headers"]
 		FilebasedUserManager.__init__(self)
 
 	def logout_user(self, user):

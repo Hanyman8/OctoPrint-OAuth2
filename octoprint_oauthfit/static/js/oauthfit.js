@@ -35,6 +35,49 @@ $(function() {
         self.control = parameters[2];
 
 
+        self.loginState.login = function () {
+
+            var oauth_plugin_settings = self.settings.settings.plugins.oauthfit;
+            var active = self.settings.settings.plugins.oauthfit.active_client();
+
+            var client_id = oauth_plugin_settings[active].client_id();
+            var redirect_uri = oauth_plugin_settings[active].redirect_uri();
+            var login_path = oauth_plugin_settings[active].login_path();
+
+            // persistent browser storage pro ulozeni state
+            var state = guid();
+
+            var params = ['response_type=code', 'client_id=' + client_id, 'redirect_uri=' + redirect_uri, 'state=' + state];
+            var query = params.join('&');
+            var url = login_path + query;
+            var href = window.location.href;
+
+            window.location.replace(url);
+        };
+
+        self.loginState.logout = function() {
+            var parser = document.createElement('a');
+            var active = self.settings.settings.plugins.oauthfit.active_client();
+            parser.href = self.settings.settings.plugins.oauthfit[active].login_path();
+            var provider = parser.host;
+
+            return OctoPrint.browser.logout()
+                .done(function(response) {
+
+                    new PNotify({title: gettext("Logout from OctoPrint successful"), text: gettext("You are now logged out"), type: "success"});
+                    new PNotify({title: gettext("OAuth Logout"), text: gettext("To log out completely, make sure to log out from OAuth provider: " + provider), hide: false});
+
+                    self.loginState.fromResponse(response);
+                })
+                .error(function(error) {
+                    if (error && error.status === 401) {
+                         self.loginState.fromResponse(false);
+                    }
+                });
+        };
+
+
+
         self.loginState.userMenuText = ko.pureComputed(function () {
            if (self.loginState.loggedIn()){
                return self.loginState.username();
@@ -88,88 +131,11 @@ $(function() {
 
         }
 
-
-        self.loginState.login = function (u, p, r) {
-
-            var oauth_plugin_settings = self.settings.settings.plugins.oauthfit;
-            // alert("tmp4 = "+ oauth_plugin_settings);
-
-            // console.log(oauth_plugin_settings);
-            // alert(JSON.stringify(oauth_plugin_settings, null, 4));
-
-            var client_id = oauth_plugin_settings.client_id();
-            var redirect_uri = oauth_plugin_settings.redirect_uri();
-            var login_path = oauth_plugin_settings.login_path();
-
-            console.log("client id = " + client_id + "    redirect =" +redirect_uri);
-
-            // persistent browser storage pro ulozeni state
-            var state = guid();
-
-            var params = ['response_type=code', 'client_id=' + client_id, 'redirect_uri=' + redirect_uri, 'state=' + state];
-            var query = params.join('&');
-            var url = login_path + query;
-            var href = window.location.href;
-
-          //  window.alert("0000");
-
-            window.location.replace(url);
-        };
-
-        self.loginState.logout = function() {
-            var parser = document.createElement('a');
-            parser.href = self.settings.settings.plugins.oauthfit.login_path();
-            var provider = parser.host;
-
-            return OctoPrint.browser.logout()
-                .done(function(response) {
-
-                    new PNotify({title: gettext("Logout from OctoPrint successful"), text: gettext("You are now logged out"), type: "success"});
-                    new PNotify({title: gettext("OAuth Logout"), text: gettext("To log out completely, make sure to log out from OAuth provider: " + provider), hide: false});
-
-                    self.loginState.fromResponse(response);
-                })
-                .error(function(error) {
-                    if (error && error.status === 401) {
-                         self.loginState.fromResponse(false);
-                    }
-                });
-        };
-
     }
 
-    // this will hold the URL currently displayed by the iframe
-    self.currentUrl = ko.observable();
-
-    // this will hold the URL entered in the text field
-    self.newUrl = ko.observable();
-
-
-
-    // this will be called when the user clicks the "Go" button and set the iframe's URL to
-    // the entered URL
-    self.goToUrl = function() {
-        self.currentUrl(self.newUrl());
-    };
 
     self.onStartup = function () {
         self.elementOAuthLogin = $("#oauth_login");
-        console.log("onstartup ="+ self.settings.settings.plugins.oauthfit.client_secret());
-    };
-
-
-
-
-    // This will get called before the OAuthViewModel gets bound to the DOM, but after its
-    // dependencies have already been initialized. It is especially guaranteed that this method
-    // gets called _after_ the settings have been retrieved from the OctoPrint backend and thus
-    // the SettingsViewModel been properly populated.
-    self.onBeforeBinding = function() {
-        self.newUrl(self.settings.settings.plugins.oauthfit.url());
-        // var tmp3 = self.settings.requestData();
-        // alert("tmp3 = "+ tmp3);
-        // console.log(JSON.stringify(tmp3, null, 4));
-        // alert(JSON.stringify(tmp3, null, 4));
     };
 
 
