@@ -14,8 +14,6 @@ import pprint
 
 # CLIENT_ID = SETTINGS.get("plugins")
 
-CLIENT_SECRET = "678089f05cb59c524febf431e00837bb8f70a01d"
-REDIRECT_URI = "http://0.0.0.0:5000/"
 PATH_FOR_TOKEN = "https://github.com/login/oauth/access_token"
 HEADERS_FOR_TOKEN = {'Accept': 'application/json'}
 PATH_USER_INFO = "https://api.github.com/user?access_token="

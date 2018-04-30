@@ -1,9 +1,6 @@
+var glob;
 $(function() {
 
-    var CLIENT_ID = "1cb4ca8a2734ba9723ff";
-    var CLIENT_SECRET = "678089f05cb59c524febf431e00837bb8f70a01d";
-    var REDIRECT_URI = "http://0.0.0.0:5000/";
-    // var PATH = "https://auth.fit.cvut.cz/oauth/authorize?";
     var PATH = "https://github.com/login/oauth/authorize?";
     var PROVIDER = "https://github.com";
 
@@ -31,6 +28,7 @@ $(function() {
     function OAuthLoginModel(parameters) {
         var self = this;
 
+
         $(".dropdown-menu").click(function (e) {
             e.stopPropagation();
         });
@@ -39,8 +37,6 @@ $(function() {
         self.settings = parameters[1];
         self.control = parameters[2];
 
-        // self.loginState.loginUser = ko.observable(false);
-        // self.loginState = ko.observable(false);
 
         self.loginState.userMenuText = ko.pureComputed(function () {
            if (self.loginState.loggedIn()){
@@ -53,13 +49,9 @@ $(function() {
 
         var code = getParameterByName("code",window.location.href);
         var stateFromOAuth = getParameterByName("state", window.location.href);
-        //var remember = true; // tmp true
 
         if(!!stateFromOAuth && !!code){
-          //  window.alert("cond ok, state=" + stateFromOAuth + "   code=" + code);
             var tmp = window.location.host;
-           // window.alert(tmp);
-
 
             OctoPrint.browser.login(code, stateFromOAuth, false)
                 .done(function (response) {
@@ -97,19 +89,25 @@ $(function() {
                     }
                 });
 
-
-            // window.location.replace("http://"+ tmp);
-
         }
-
-
 
 
         self.loginState.login = function (u, p, r) {
 
+            var oauth_plugin_settings = self.settings.settings.plugins.oauthfit;
+            // alert("tmp4 = "+ oauth_plugin_settings);
+
+            // console.log(oauth_plugin_settings);
+            // alert(JSON.stringify(oauth_plugin_settings, null, 4));
+
+            var client_id = oauth_plugin_settings.client_id();
+            var redirect_uri = oauth_plugin_settings.redirect_uri();
+
+            console.log("client id = " + client_id + "    redirect =" +redirect_uri);
+
             var state = guid();
 
-            var params = ['response_type=code', 'client_id=' + CLIENT_ID, 'redirect_uri=' + REDIRECT_URI, 'state=' + state];
+            var params = ['response_type=code', 'client_id=' + client_id, 'redirect_uri=' + redirect_uri, 'state=' + state];
             var query = params.join('&');
             var url = PATH + query;
             var href = window.location.href;
@@ -135,9 +133,6 @@ $(function() {
                 });
         };
 
-
-
-
     }
 
     // this will hold the URL currently displayed by the iframe
@@ -156,6 +151,7 @@ $(function() {
 
     self.onStartup = function () {
         self.elementOAuthLogin = $("#oauth_login");
+        console.log("onstartup ="+ self.settings.settings.plugins.oauthfit.client_secret());
     };
 
 
@@ -165,11 +161,12 @@ $(function() {
     // the SettingsViewModel been properly populated.
     self.onBeforeBinding = function() {
         self.newUrl(self.settings.settings.plugins.oauthfit.url());
-        self.goToUrl();
+        var tmp3 = self.settings.requestData();
+        alert("tmp3 = "+ tmp3);
+        console.log(JSON.stringify(tmp3, null, 4));
+        alert(JSON.stringify(tmp3, null, 4));
     };
 
-
-  //  OAuthViewModel.myMessage("Nazdar");
 
     // This is how our plugin registers itself with the application, by adding some configuration
     // information to the global variable OCTOPRINT_VIEWMODELS
@@ -183,6 +180,6 @@ $(function() {
         dependencies: ["loginStateViewModel", "settingsViewModel", "controlViewModel"],
 
         // Finally, this is the list of selectors for all elements we want this view model to be bound to.
-        elements: ["#tab_plugin_oauthfit"]
+        // elements: ["#tab_plugin_oauthfit"]
     });
 });
