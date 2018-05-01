@@ -23,7 +23,7 @@ Both are should be stored in config.yaml file. Under plugins section,
 there should be list od your plugins, and now you need to put there
 also configuration for plugin OAuth2.
 
-###config.yaml
+### config.yaml
 
 ```yaml
 plugins:
@@ -109,7 +109,7 @@ plugins:
 ```
 Note: this is not valid client_id and client_secret :+1:
 
-###users.yaml
+### users.yaml
 
 For congiguration users.yaml you have to set a user with admin role.
 This user needs to have same username as the username from server, for example:
