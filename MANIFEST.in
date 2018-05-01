@@ -1,4 +1,4 @@
 include README.md
-recursive-include octoprint_oauthfit/templates *
-recursive-include octoprint_oauthfit/translations *
-recursive-include octoprint_oauthfit/static *
+recursive-include octoprint_oauth2/templates *
+recursive-include octoprint_oauth2/translations *
+recursive-include octoprint_oauth2/static *

@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import absolute_import
 
-from octoprint_oauthfit.oauth_user_manager import OAuthbasedUserManager
+from octoprint_oauth2.oauth_user_manager import OAuthbasedUserManager
 import octoprint.plugin
 import logging
 import yaml
@@ -10,11 +10,11 @@ import yaml
 # stream = open(config, 'r')
 # data = yaml.load(stream)
 
-class OAuthFITPlugin(octoprint.plugin.StartupPlugin,
-					   octoprint.plugin.TemplatePlugin,
-					   octoprint.plugin.SettingsPlugin,
-					   octoprint.plugin.AssetPlugin
-					   ):
+class OAuth2Plugin(octoprint.plugin.StartupPlugin,
+				   octoprint.plugin.TemplatePlugin,
+				   octoprint.plugin.SettingsPlugin,
+				   octoprint.plugin.AssetPlugin
+				   ):
 	def on_after_startup(self):
 		self._logger.info("############# Hello World FIT OAuth 0003!")
 		# self._logger.info("Mistr hanus vice na: %s" %self._settings.get(["url"]))
@@ -33,7 +33,7 @@ class OAuthFITPlugin(octoprint.plugin.StartupPlugin,
 	def get_template_configs(self):
 		self._logger.info("************ Template configs *************")
 		return [
-			dict(type="navbar", template="oauthfit_login.jinja2", custom_bindings=False, replaces="login"),
+			dict(type="navbar", template="oauth2_login.jinja2", custom_bindings=False, replaces="login"),
 			dict(type="settings", custom_bindings=False)
 		]
 
@@ -43,8 +43,8 @@ class OAuthFITPlugin(octoprint.plugin.StartupPlugin,
 	def get_assets(self):
 		self._logger.info("****** getting Assets ******")
 		return dict(
-			js=["js/oauthfit.js"],
-			css=["css/oauthfit.css"]
+			js=["js/oauth2.js"],
+			css=["css/oauth2.css"]
 		)
 
 def user_factory_hook(components, settings, *args, **kwargs):
@@ -53,7 +53,7 @@ def user_factory_hook(components, settings, *args, **kwargs):
 
 
 __plugin_name__ = "OAuth"
-__plugin_implementation__ = OAuthFITPlugin()
+__plugin_implementation__ = OAuth2Plugin()
 __plugin_hooks__ = {
 	"octoprint.users.factory": user_factory_hook
 }

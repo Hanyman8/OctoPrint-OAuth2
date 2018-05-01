@@ -44,8 +44,8 @@ $(function() {
 
         self.loginState.login = function () {
 
-            var oauth_plugin_settings = self.settings.settings.plugins.oauthfit;
-            var active = self.settings.settings.plugins.oauthfit.active_client();
+            var oauth_plugin_settings = self.settings.settings.plugins.oauth2;
+            var active = self.settings.settings.plugins.oauth2.active_client();
 
             var redirect_uri = parseUrl(window.location.href).origin + "/";
 
@@ -63,8 +63,8 @@ $(function() {
         };
 
         self.loginState.logout = function() {
-            var active = self.settings.settings.plugins.oauthfit.active_client();
-            var provider = parseUrl(self.settings.settings.plugins.oauthfit[active].login_path()).host;
+            var active = self.settings.settings.plugins.oauth2.active_client();
+            var provider = parseUrl(self.settings.settings.plugins.oauth2[active].login_path()).host;
 
             return OctoPrint.browser.logout()
                 .done(function(response) {
