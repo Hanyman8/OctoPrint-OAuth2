@@ -52,8 +52,9 @@ $(function() {
             var client_id = oauth_plugin_settings[active][redirect_uri].client_id();
             var login_path = oauth_plugin_settings[active].login_path();
 
-            // persistent browser storage pro ulozeni state
             var state = guid();
+            // setting state to local storage
+            localStorage.setItem("state", state);
 
             var params = ['response_type=code', 'client_id=' + client_id, 'redirect_uri=' + redirect_uri, 'state=' + state];
             var query = params.join('&');
@@ -95,8 +96,15 @@ $(function() {
         var code = getParameterByName("code",window.location.href);
         var stateFromOAuth = getParameterByName("state", window.location.href);
 
-        // todo check state
+
         if(!!stateFromOAuth && !!code){
+            var state = localStorage.getItem("state");
+            localStorage.removeItem("state");
+            if (stateFromOAuth != state) {
+                alert("State sent to oauth server is not same. Possible attack");
+                return;
+            };
+
             var url = parseUrl(window.location.href).origin + "/";
 
             OctoPrint.browser.login(code, url, false)

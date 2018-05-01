@@ -33,7 +33,11 @@ class OAuthbasedUserManager(FilebasedUserManager):
 								 data=post_data,
 								 headers=self.TOKEN_HEADERS)
 
-		token_json = response.json()
+		try:
+			token_json = response.json()
+		except ValueError:
+			logging.getLogger("octoprint.plugins." + __name__).error("JSON required, perhaps you forgot to specific it with token headers")
+			return None
 
 		try:
 			# token is OK
@@ -42,9 +46,9 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		except KeyError:
 			try:
 				error = token_json["error"]
-				logging.getLogger("octoprint.plugins." + __name__).info("Error of access token: " + error)
+				logging.getLogger("octoprint.plugins." + __name__).error("Error of access token: " + error)
 			except:
-				logging.getLogger("octoprint.plugins." + __name__).info("Error of access token, error message not found")
+				logging.getLogger("octoprint.plugins." + __name__).error("Error of access token, error message not found")
 
 		return None
 
@@ -86,7 +90,10 @@ class OAuthbasedUserManager(FilebasedUserManager):
 			self.CLIENT_SECRET = self.oauth2[self.active_client][self.REDIRECT_URI]["client_secret"]
 			self.PATH_FOR_TOKEN = self.oauth2[self.active_client]["token_path"]
 			self.PATH_USER_INFO = self.oauth2[self.active_client]["user_info_path"]
-			self.TOKEN_HEADERS = self.oauth2[self.active_client]["token_headers"]
+			try:
+				self.TOKEN_HEADERS = self.oauth2[self.active_client]["token_headers"]
+			except KeyError:
+				self.TOKEN_HEADERS = ""
 			access_token = self.get_token(code)
 
 			if access_token is None:
