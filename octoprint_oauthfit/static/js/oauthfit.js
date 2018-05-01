@@ -1,6 +1,13 @@
 var glob;
 $(function() {
 
+    function parseUrl(url) {
+        var parser = document.createElement('a');
+        parser.href = url;
+
+        return parser;
+    }
+
     function guid() {
       function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -40,8 +47,9 @@ $(function() {
             var oauth_plugin_settings = self.settings.settings.plugins.oauthfit;
             var active = self.settings.settings.plugins.oauthfit.active_client();
 
-            var client_id = oauth_plugin_settings[active].client_id();
-            var redirect_uri = oauth_plugin_settings[active].redirect_uri();
+            var redirect_uri = parseUrl(window.location.href).origin + "/";
+
+            var client_id = oauth_plugin_settings[active][redirect_uri].client_id();
             var login_path = oauth_plugin_settings[active].login_path();
 
             // persistent browser storage pro ulozeni state
@@ -50,16 +58,13 @@ $(function() {
             var params = ['response_type=code', 'client_id=' + client_id, 'redirect_uri=' + redirect_uri, 'state=' + state];
             var query = params.join('&');
             var url = login_path + query;
-            var href = window.location.href;
 
             window.location.replace(url);
         };
 
         self.loginState.logout = function() {
-            var parser = document.createElement('a');
             var active = self.settings.settings.plugins.oauthfit.active_client();
-            parser.href = self.settings.settings.plugins.oauthfit[active].login_path();
-            var provider = parser.host;
+            var provider = parseUrl(self.settings.settings.plugins.oauthfit[active].login_path()).host;
 
             return OctoPrint.browser.logout()
                 .done(function(response) {
@@ -90,10 +95,11 @@ $(function() {
         var code = getParameterByName("code",window.location.href);
         var stateFromOAuth = getParameterByName("state", window.location.href);
 
+        // todo check state
         if(!!stateFromOAuth && !!code){
-            var tmp = window.location.host;
+            var url = parseUrl(window.location.href).origin + "/";
 
-            OctoPrint.browser.login(code, stateFromOAuth, false)
+            OctoPrint.browser.login(code, url, false)
                 .done(function (response) {
                     new PNotify({
                         title: gettext("Login OK"),
@@ -128,9 +134,7 @@ $(function() {
                         }
                     }
                 });
-
         }
-
     }
 
 
