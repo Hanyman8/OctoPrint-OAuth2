@@ -29,17 +29,7 @@ also configuration for plugin OAuth2.
 plugins:
   oauth2:
 ```
-Under `oauth2` plugin, there is `active_client`, and servers,
-that can use OAuth2 authentication. `active_client` says which one
-should be used for authentication.
-```yaml
-plugins:
-  oauth2:
-    active_client: github
-    github: ...
-    google: ...
-    facebook: ...
-```
+
 Under your client, there have to be basic information about,
 where to log in via OAuth2 used by `login_path`, then url where
 the access token should be obtained in value `token_path`.  In `user_info_path`
@@ -48,15 +38,12 @@ from access token has to be in JSON therefore you can also set some headers for
 plugin obtaining access token.
 
 ```yaml
-active_client: github
-github:
+oauth2:
   login_path: https://github.com/login/oauth/authorize?
   token_path: https://github.com/login/oauth/access_token
   user_info_path: https://api.github.com/user?access_token=
   token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
     Accept: application/json
-google: ...
-facebook: ...
 ```
 Finnaly every client needs redirection_uri, client_id and client_secret.
 Because one client application has only one redirection_uri, we need to specific
@@ -65,8 +52,7 @@ if we want to redirect back after authorization to `0.0.0.0:5000` and
 not `localhost:5000` we have to specify that.
 
 ```yaml
-active_client: github
-github:
+oauth2:
   login_path: https://github.com/login/oauth/authorize?
   token_path: https://github.com/login/oauth/access_token
   user_info_path: https://api.github.com/user?access_token=
@@ -75,37 +61,24 @@ github:
   http://localhost:5000/: #redirect_uri
     client_id: 5944a4d751a567c31 #example of client_id
     client_secret: 3a9314582de82304faq5865a2d565734 #example of secret
-google: ...
-facebook: ...
 ```
 
 Anf finally here is an example of config.yaml configuration using more redirect_uris
-on active client github.
+on client.
 ```yaml
 plugins:
   oauth2:
-    active_client: github
-    github: #server that is used
-      login_path: https://github.com/login/oauth/authorize?
-      token_path: https://github.com/login/oauth/access_token
-      user_info_path: https://api.github.com/user?access_token=
-      token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
-        Accept: application/json
-      http://localhost:5000/: #redirect_uri from
-        client_id: 5944a4d751a567c31 #example of client_id
-        client_secret: 3a9314582de82304faq5865a2d565734 #example of secret
-      http://0.0.0.0:5000/:
-        client_id: 1cbef6227fa4b23ff
-        client_secret: 9a6541ee16c6c0c3fe65825ff5c7df25
-    google: #inactive server
-      login_path: google_login_url
-      token_path: google_url_to_get_access_token
-      user_info_path: google_url_to_get_user_data
-      192.168.0.1:
-        client_id: 1234
-        client_secret: qwert
-
-
+    login_path: https://github.com/login/oauth/authorize?
+    token_path: https://github.com/login/oauth/access_token
+    user_info_path: https://api.github.com/user?access_token=
+    token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
+      Accept: application/json
+    http://localhost:5000/: #redirect_uri from
+      client_id: 5944a4d751a567c31 #example of client_id
+      client_secret: 3a9314582de82304faq5865a2d565734 #example of secret
+    http://0.0.0.0:5000/:
+      client_id: 1cbef6227fa4b23ff
+      client_secret: 9a6541ee16c6c0c3fe65825ff5c7df25
 ```
 Note: this is not valid client_id and client_secret :+1:
 
@@ -113,7 +86,7 @@ Note: this is not valid client_id and client_secret :+1:
 
 For congiguration users.yaml you have to set a user with admin role.
 This user needs to have same username as the username from server, for example:
-```yaml
+```yaml 
 YourUsername1234:
   active: true
   apikey: null

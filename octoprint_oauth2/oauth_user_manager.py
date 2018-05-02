@@ -12,7 +12,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		self._components = components
 		self._settings = settings
 		self.oauth2 = self._settings.get(["plugins", "oauth2"])
-		self.active_client = self.oauth2["active_client"]
+		FilebasedUserManager.__init__(self)
 		FilebasedUserManager.__init__(self)
 
 	def logout_user(self, user):
@@ -86,12 +86,12 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 		if not isinstance(user, SessionUser):
 			code = user.get_id()
-			self.CLIENT_ID = self.oauth2[self.active_client][self.REDIRECT_URI]["client_id"]
-			self.CLIENT_SECRET = self.oauth2[self.active_client][self.REDIRECT_URI]["client_secret"]
-			self.PATH_FOR_TOKEN = self.oauth2[self.active_client]["token_path"]
-			self.PATH_USER_INFO = self.oauth2[self.active_client]["user_info_path"]
+			self.CLIENT_ID = self.oauth2[self.REDIRECT_URI]["client_id"]
+			self.CLIENT_SECRET = self.oauth2[self.REDIRECT_URI]["client_secret"]
+			self.PATH_FOR_TOKEN = self.oauth2["token_path"]
+			self.PATH_USER_INFO = self.oauth2["user_info_path"]
 			try:
-				self.TOKEN_HEADERS = self.oauth2[self.active_client]["token_headers"]
+				self.TOKEN_HEADERS = self.oauth2["token_headers"]
 			except KeyError:
 				self.TOKEN_HEADERS = ""
 			access_token = self.get_token(code)

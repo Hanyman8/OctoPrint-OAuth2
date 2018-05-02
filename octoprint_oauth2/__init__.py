@@ -4,30 +4,12 @@ from __future__ import absolute_import
 from octoprint_oauth2.oauth_user_manager import OAuthbasedUserManager
 import octoprint.plugin
 import logging
-import yaml
-
-# config = "~/.octoprint/config.yaml"
-# stream = open(config, 'r')
-# data = yaml.load(stream)
 
 class OAuth2Plugin(octoprint.plugin.StartupPlugin,
 				   octoprint.plugin.TemplatePlugin,
 				   octoprint.plugin.SettingsPlugin,
 				   octoprint.plugin.AssetPlugin
 				   ):
-	def on_after_startup(self):
-		self._logger.info("############# Hello World FIT OAuth 0003!")
-		# self._logger.info("Mistr hanus vice na: %s" %self._settings.get(["url"]))
-
-
-	# Settings plugin mixin
-	# def get_settings_defaults(self):
-	# 	self._logger.info("####### getting settings 44444")
-	# 	return dict()
-
-	# def get_template_vars(self):
-	# 	self._logger.info("######## get template vars")
-	# 	return dict(url=self._settings.get(["url"]))
 
 	# Template plugin mixin
 	def get_template_configs(self):

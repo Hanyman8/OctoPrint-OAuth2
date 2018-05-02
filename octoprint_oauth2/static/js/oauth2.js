@@ -45,12 +45,11 @@ $(function() {
         self.loginState.login = function () {
 
             var oauth_plugin_settings = self.settings.settings.plugins.oauth2;
-            var active = self.settings.settings.plugins.oauth2.active_client();
 
             var redirect_uri = parseUrl(window.location.href).origin + "/";
 
-            var client_id = oauth_plugin_settings[active][redirect_uri].client_id();
-            var login_path = oauth_plugin_settings[active].login_path();
+            var client_id = oauth_plugin_settings[redirect_uri].client_id();
+            var login_path = oauth_plugin_settings.login_path();
 
             var state = guid();
             // setting state to local storage
@@ -64,8 +63,7 @@ $(function() {
         };
 
         self.loginState.logout = function() {
-            var active = self.settings.settings.plugins.oauth2.active_client();
-            var provider = parseUrl(self.settings.settings.plugins.oauth2[active].login_path()).host;
+            var provider = parseUrl(self.settings.settings.plugins.oauth2.login_path()).host;
 
             return OctoPrint.browser.logout()
                 .done(function(response) {
