@@ -13,7 +13,6 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		self._settings = settings
 		self.oauth2 = self._settings.get(["plugins", "oauth2"])
 		FilebasedUserManager.__init__(self)
-		FilebasedUserManager.__init__(self)
 
 	def logout_user(self, user):
 		logging.getLogger("octoprint.plugins." + __name__).info("OAuth Logging out")
