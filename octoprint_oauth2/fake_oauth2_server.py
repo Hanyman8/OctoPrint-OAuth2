@@ -58,8 +58,6 @@ class TokenHandler(BaseHTTPRequestHandler):
 		self.end_headers()
 
 	def authorize(self, info):
-		print("info:")
-		print(info)
 		print (info['client_id'])
 		try:
 			if info['client_id'] == CLIENT_ID:
