@@ -96,6 +96,7 @@ class TokenHandler(BaseHTTPRequestHandler):
 
 		return data
 
+	# access token input
 	def fake_user_info(self, username):
 
 		data = {'username': username}
