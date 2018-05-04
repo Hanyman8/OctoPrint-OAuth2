@@ -4,6 +4,6 @@ python:
 install:
  - pip install pytest
 script:
- - python -m pytest ./octoprint_oauth2/tests/test_user_manager.py
+ - python -m pytest
 
 sudo: false
