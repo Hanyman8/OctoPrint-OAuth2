@@ -3,7 +3,7 @@ import threading
 import pytest
 from octoprint_oauth2.oauth_user_manager import OAuthbasedUserManager
 from octoprint_oauth2.fake_oauth2_server import serve_forever
-
+import octoprint
 
 CLIENT_ID = "abc"
 CLIENT_SECRET = "xyz"
