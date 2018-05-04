@@ -45,7 +45,6 @@ BAD_ACCESS_TOKEN = "badAT"
 
 def parse_info(info):
 	print("parser")
-	print(info)
 	parsed = urlparse.urlparse(info)
 	data = dict(urlparse.parse_qsl(parsed.query))
 	return data
