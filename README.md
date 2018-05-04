@@ -37,11 +37,15 @@ has to be url, where information about user is stored. This information
 from access token has to be in JSON therefore you can also set some headers for
 plugin obtaining access token.
 
+Resource servers use different keywords for username (e.g. name, username, user_id, login).
+For plugin you need to specify that with `username_key`
+
 ```yaml
 oauth2:
   login_path: https://github.com/login/oauth/authorize?
   token_path: https://github.com/login/oauth/access_token
   user_info_path: https://api.github.com/user?access_token=
+  username_key: login
   token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
     Accept: application/json
 ```
@@ -56,6 +60,7 @@ oauth2:
   login_path: https://github.com/login/oauth/authorize?
   token_path: https://github.com/login/oauth/access_token
   user_info_path: https://api.github.com/user?access_token=
+  username_key: login
   token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
     Accept: application/json
   http://localhost:5000/: #redirect_uri
@@ -71,6 +76,7 @@ plugins:
     login_path: https://github.com/login/oauth/authorize?
     token_path: https://github.com/login/oauth/access_token
     user_info_path: https://api.github.com/user?access_token=
+    username_key: login
     token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
       Accept: application/json
     http://localhost:5000/: #redirect_uri from

@@ -21,15 +21,14 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 	def get_token(self, code):
 
-		client_auth = requests.auth.HTTPBasicAuth(self.CLIENT_ID, self.CLIENT_SECRET)
 		post_data = {"grant_type": "authorization_code",
 					 "code": code,
-					 "redirect_uri": self.REDIRECT_URI
+					 "redirect_uri": self.REDIRECT_URI,
+					 "client_id": self.CLIENT_ID,
+					 "client_secret": self.CLIENT_SECRET
 					 }  # json required
 
-
 		response = requests.post(self.PATH_FOR_TOKEN,
-								 auth=client_auth,
 								 data=post_data,
 								 headers=self.TOKEN_HEADERS)
 
@@ -54,13 +53,17 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 	def get_username(self, access_token):
 
-		url = self.PATH_USER_INFO + access_token
-		response = urllib.urlopen(url)
-		data = json.loads(response.read())
+		params = {
+			"access_token": access_token
+		}
+
+		response = requests.get(self.PATH_USER_INFO,
+								params=params)
+
+		data = response.json()
 
 		try:
-			# todo function for login, user_id
-			login = data["login"]
+			login = data[self.USERNAME_KEY]
 			return login
 		except KeyError:
 			pass
@@ -86,14 +89,16 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 		if not isinstance(user, SessionUser):
 			code = user.get_id()
+
 			self.CLIENT_ID = self.oauth2[self.REDIRECT_URI]["client_id"]
 			self.CLIENT_SECRET = self.oauth2[self.REDIRECT_URI]["client_secret"]
 			self.PATH_FOR_TOKEN = self.oauth2["token_path"]
 			self.PATH_USER_INFO = self.oauth2["user_info_path"]
+			self.USERNAME_KEY = self.oauth2["username_key"]
 			try:
 				self.TOKEN_HEADERS = self.oauth2["token_headers"]
 			except KeyError:
-				self.TOKEN_HEADERS = ""
+				self.TOKEN_HEADERS = None
 			access_token = self.get_token(code)
 
 			if access_token is None:
@@ -101,6 +106,9 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 			username = self.get_username(access_token)
 			user = FilebasedUserManager.findUser(self,username)
+			if username is None:
+				logging.getLogger("octoprint.plugins." + __name__).error("Username none")
+				return None
 
 			if user is None:
 				self.addUser(username, "", True, ["user"])
