@@ -30,35 +30,36 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		logging.getLogger("octoprint.plugins." + __name__).info("OAuth Logging out")
 		UserManager.logout_user(self, user)
 
-	def get_token(self, oauth, code):
-		print(code)
-		# fetching token using requests_oauthlib library
-		token_json = oauth.fetch_token(self.PATH_FOR_TOKEN,
-									   authorization_response="authorization_code",
-									   code=code,
-									   client_id=self.CLIENT_ID,
-									   client_secret=self.CLIENT_SECRET,
-									   headers=self.TOKEN_HEADERS)
-
-		print(token_json)
-
+	def get_token(self, oauth2_session, code):
 		try:
-			# token is OK
-			access_token = token_json["access_token"]
-			return access_token
-		except KeyError:
+			token_json = oauth2_session.fetch_token(self.PATH_FOR_TOKEN,
+												authorization_response="authorization_code",
+												code=code,
+												client_id=self.CLIENT_ID,
+												client_secret=self.CLIENT_SECRET,
+												headers=self.TOKEN_HEADERS)
 			try:
-				error = token_json["error"]
-				logging.getLogger("octoprint.plugins." + __name__).error("Error of access token: " + error)
-			except:
-				logging.getLogger("octoprint.plugins." + __name__).error("Error of access token, error message not found")
+				# token is OK
+				access_token = token_json["access_token"]
+				return access_token
+			except KeyError:
+				try:
+					error = token_json["error"]
+					logging.getLogger("octoprint.plugins." + __name__).error("Error of access token: " + error)
+				except:
+					logging.getLogger("octoprint.plugins." + __name__).error("Error of access token, error message not found")
+
+		except:
+			logging.getLogger("octoprint.plugins." + __name__).error("Bad authorization_code")
+
+			# print(token_json)
 
 		return None
 
-	def get_username(self, oauth, access_token):
+	def get_username(self, oauth2_session, access_token):
 
 		# GET user data from resource server
-		response = oauth.get(self.PATH_USER_INFO)
+		response = oauth2_session.get(self.PATH_USER_INFO)
 		data = response.json()
 
 		# Try if data contains USERNAME_KEY from config file
@@ -89,14 +90,14 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 			self.CLIENT_ID = self.oauth2[self.REDIRECT_URI]["client_id"]
 			self.CLIENT_SECRET = self.oauth2[self.REDIRECT_URI]["client_secret"]
-			oauth = OAuth2Session(self.CLIENT_ID,
-								  redirect_uri=self.REDIRECT_URI)
-			access_token = self.get_token(oauth, code)
+			oauth2_session = OAuth2Session(self.CLIENT_ID,
+										   redirect_uri=self.REDIRECT_URI)
+			access_token = self.get_token(oauth2_session, code)
 
 			if access_token is None:
 				return None
 
-			username = self.get_username(oauth, access_token)
+			username = self.get_username(oauth2_session, access_token)
 			user = FilebasedUserManager.findUser(self, username)
 			if username is None:
 				logging.getLogger("octoprint.plugins." + __name__).error("Username none")
