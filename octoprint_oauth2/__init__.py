@@ -21,7 +21,6 @@ class OAuth2Plugin(octoprint.plugin.StartupPlugin,
 
 
 	# Asset plugin mixin
-
 	def get_assets(self):
 		self._logger.info("****** getting Assets ******")
 		return dict(

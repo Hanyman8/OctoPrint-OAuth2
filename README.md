@@ -42,9 +42,9 @@ For plugin you need to specify that with `username_key`
 
 ```yaml
 oauth2:
-  login_path: https://github.com/login/oauth/authorize?
+  login_path: https://github.com/login/oauth/authorize
   token_path: https://github.com/login/oauth/access_token
-  user_info_path: https://api.github.com/user?access_token=
+  user_info_path: https://api.github.com/user
   username_key: login
   token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
     Accept: application/json
@@ -57,9 +57,9 @@ not `localhost:5000` we have to specify that.
 
 ```yaml
 oauth2:
-  login_path: https://github.com/login/oauth/authorize?
+  login_path: https://github.com/login/oauth/authorize
   token_path: https://github.com/login/oauth/access_token
-  user_info_path: https://api.github.com/user?access_token=
+  user_info_path: https://api.github.com/user
   username_key: login
   token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
     Accept: application/json
@@ -73,9 +73,9 @@ on client.
 ```yaml
 plugins:
   oauth2:
-    login_path: https://github.com/login/oauth/authorize?
+    login_path: https://github.com/login/oauth/authorize
     token_path: https://github.com/login/oauth/access_token
-    user_info_path: https://api.github.com/user?access_token=
+    user_info_path: https://api.github.com/user
     username_key: login
     token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
       Accept: application/json
@@ -104,5 +104,67 @@ YourUsername1234:
 ```
 Every other user, who is logged via OAuth2 authentication isstored to users.yaml
 file with role user. Through user interace admin can set his role to user later.
+
+## Example for github
+### Create github OAuth App
+First you need to set up your own OAuth App on github.
+You can find tutorial here: [create OAuth App](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/) 
+
+### Set up your config.yaml
+Then you need to provide to plugin configuration. You have to set:
+ 1. **login_path:** [Url, where you log in into github](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/#1-users-are-redirected-to-request-their-github-identity)
+ 2. **token_path:** [Url, where should plugin obtain access_token](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/#2-users-are-redirected-back-to-your-site-by-github)
+ 3. **user_info_path:** [Url, where plugin will get user information](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/#3-use-the-access-token-to-access-the-api) using `access_token`
+ 4. **username_key:** You need to provide, how the user would be logged in. Note: This username has to be unique,
+ because it is stored in the users.yaml, where settings for this user are stored.
+ ![User login name](user_info_github.png)
+ 5. **token_headers:** This plugin requires info in [JSON](https://en.wikipedia.org/wiki/JSON) format,
+ for github you need to specify that with a header that is post to get `access_token`
+ 
+ So now our `config.yaml` look like this:
+ ```yaml
+plugins: # List of your plugins and their configurations. If it is missing, add it too   
+  oauth2: # Name of the plugin
+    login_path: https://github.com/login/oauth/authorize
+    token_path: https://github.com/login/oauth/access_token
+    user_info_path: https://api.github.com/user
+    username_key: login
+    token_headers:
+      Accept: application/json
+```
+Now you need to set up url redirect [URIs](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). Some servers does not 
+provide the possibility to have more than one `redirect_uri`, so you have to
+make more OAuth2 Apps. For every `redirect_uri` there is one `client_id` and `client_secret`
+
+**Simple Example:** You are running OctoPrint on "http://127.0.0.1:5000/", but
+for personal reasons you want `redirect_uri` to be "http://localhost:5000/".
+The problem is, that you specified the `redirect_uri` to be "http://127.0.0.1:5000/
+ and the authentication fails.
+
+ 6. **redirect_uri_first:**
+    1. **client_id:** your_client_id_first
+    2. **client_secret:** your_client_secret_first
+    
+    **redirect_uri_second:**
+    1. **client_id:** your_client_id_second
+    2. **client_secret:** your_client_secret_second
+
+Final configuration for using OctoPrint-Outh2 on github is:
+```yaml
+plugins:
+  oauth2:
+    login_path: https://github.com/login/oauth/authorize
+    token_path: https://github.com/login/oauth/access_token
+    user_info_path: https://api.github.com/user
+    username_key: login
+    token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
+      Accept: application/json
+    http://localhost:5000/: #redirect_uri where you run OctoPrint
+      client_id: your_client_id_first 
+      client_secret: your_client_secret_first 
+    http://0.0.0.0:5000/: # second possibility where you run OctoPrint with different client_id and client_secret
+      client_id: your_client_id_second
+      client_secret: your_client_secret_second
+```
 
 # OctoPrint-OAuth2

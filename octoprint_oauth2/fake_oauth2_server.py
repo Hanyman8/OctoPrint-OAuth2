@@ -45,7 +45,6 @@ BAD_ACCESS_TOKEN = "badAT"
 
 def parse_info(info):
 	print("parser")
-	print(info)
 	parsed = urlparse.urlparse(info)
 	data = dict(urlparse.parse_qsl(parsed.query))
 	return data
@@ -58,8 +57,6 @@ class TokenHandler(BaseHTTPRequestHandler):
 		self.end_headers()
 
 	def authorize(self, info):
-		print("info:")
-		print(info)
 		print (info['client_id'])
 		try:
 			if info['client_id'] == CLIENT_ID:

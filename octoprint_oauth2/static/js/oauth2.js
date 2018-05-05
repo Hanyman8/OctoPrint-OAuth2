@@ -57,7 +57,7 @@ $(function() {
 
             var params = ['response_type=code', 'client_id=' + client_id, 'redirect_uri=' + redirect_uri, 'state=' + state];
             var query = params.join('&');
-            var url = login_path + query;
+            var url = login_path + "?" + query;
 
             window.location.replace(url);
         };
