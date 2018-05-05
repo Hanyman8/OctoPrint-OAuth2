@@ -1,9 +1,6 @@
 from octoprint.users import *
-import octoprint.settings
-import octoprint
 import requests
 import requests.auth
-import urllib, json
 
 
 class OAuthbasedUserManager(FilebasedUserManager):
