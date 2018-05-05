@@ -111,7 +111,8 @@ First you need to set up your own OAuth App on github.
 You can find tutorial here: [create OAuth App](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/) 
 
 ### Set up your config.yaml
-Then you need to provide to plugin configuration. You have to set:
+Then you need to provide to plugin configuration. You can find your OctoPrint configuration files in `~/.octoprint` on Linux
+or in [%AppData%](https://www.howtogeek.com/318177/what-is-the-appdata-folder-in-windows/) on Windows. In `config.yaml` file you have to set:
  1. **login_path:** [Url, where you log in into github](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/#1-users-are-redirected-to-request-their-github-identity)
  2. **token_path:** [Url, where should plugin obtain access_token](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/#2-users-are-redirected-back-to-your-site-by-github)
  3. **user_info_path:** [Url, where plugin will get user information](https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/#3-use-the-access-token-to-access-the-api) using `access_token`
@@ -166,5 +167,27 @@ plugins:
       client_id: your_client_id_second
       client_secret: your_client_secret_second
 ```
+
+### Setup your users.yaml
+
+Second, your need to make your own users.yaml file. You can find it in the directory, where config.yaml is.
+And here is example, how it should look.
+
+```yaml 
+your_github_username:
+  active: true
+  apikey: null
+  password: ''
+  roles:
+  - user
+  - admin
+  settings: {}
+```
+Every other user logged with OctoPrint-OAuth2 plugin would have role `user` and will be stored in `users.yaml` too.
+If you need admin for your new user, you can change it logged in as an admin in the user interface settings or
+manually change your `users.py` file.
+
+If you need more information about configuring OctoPrint see its [documentation.](http://docs.octoprint.org/en/master/configuration/index.html)
+
 
 # OctoPrint-OAuth2
