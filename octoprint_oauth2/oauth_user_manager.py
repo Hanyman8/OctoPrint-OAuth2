@@ -12,6 +12,10 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		self.PATH_FOR_TOKEN = self.oauth2["token_path"]
 		self.PATH_USER_INFO = self.oauth2["user_info_path"]
 		self.USERNAME_KEY = self.oauth2["username_key"]
+		try:
+			self.TOKEN_HEADERS = self.oauth2["token_headers"]
+		except KeyError:
+			self.TOKEN_HEADERS = None
 
 		# These three will be initialized later.
 		# CLIENT_ID and CLIENT_SECRET need REDIRECT_URI for proper initialization
@@ -27,7 +31,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		UserManager.logout_user(self, user)
 
 	def get_token(self, oauth, code):
-
+		print(code)
 		# fetching token using requests_oauthlib library
 		token_json = oauth.fetch_token(self.PATH_FOR_TOKEN,
 									   authorization_response="authorization_code",
@@ -35,6 +39,8 @@ class OAuthbasedUserManager(FilebasedUserManager):
 									   client_id=self.CLIENT_ID,
 									   client_secret=self.CLIENT_SECRET,
 									   headers=self.TOKEN_HEADERS)
+
+		print(token_json)
 
 		try:
 			# token is OK
@@ -80,10 +86,9 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 		if not isinstance(user, SessionUser):
 			code = user.get_id()
-			try:
-				self.TOKEN_HEADERS = self.oauth2["token_headers"]
-			except KeyError:
-				self.TOKEN_HEADERS = None
+
+			self.CLIENT_ID = self.oauth2[self.REDIRECT_URI]["client_id"]
+			self.CLIENT_SECRET = self.oauth2[self.REDIRECT_URI]["client_secret"]
 			oauth = OAuth2Session(self.CLIENT_ID,
 								  redirect_uri=self.REDIRECT_URI)
 			access_token = self.get_token(oauth, code)
