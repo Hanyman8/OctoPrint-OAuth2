@@ -1,25 +1,13 @@
-import time
 import threading
-import pytest
-from octoprint_oauth2.oauth_user_manager import OAuthbasedUserManager
-from octoprint_oauth2.fake_oauth2_server import serve_forever
-from requests_oauthlib import OAuth2Session
+
 import os
+from requests_oauthlib import OAuth2Session
+
+from constants_for_tests import *
+from octoprint_oauth2.oauth_user_manager import OAuthbasedUserManager
+from octoprint_oauth2.tests.fake_oauth2_server import serve_forever
+
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
-
-CLIENT_ID = "abc"
-CLIENT_SECRET = "xyz"
-REDIRECT_URI = "http://0.0.0.0:5000/"
-
-GOOD_USERNAME = "good"
-BAD_USERNAME = "bad"
-
-GOOD_CODE = "goodcode"
-BAD_CODE = "badcode"
-
-GOOD_ACCESS_TOKEN = "goodAT"
-BAD_ACCESS_TOKEN = "badAT"
 
 
 # time.sleep(1)
@@ -53,3 +41,23 @@ class TestUserManager:
         assert access_token == None
         assert access_token != GOOD_ACCESS_TOKEN
         assert access_token != ""
+
+    def test_get_username_good(self):
+        oauth2_session = OAuth2Session(self.user_manager.CLIENT_ID, redirect_uri=self.user_manager.REDIRECT_URI)
+        oauth2_session.access_token = GOOD_ACCESS_TOKEN
+        username = self.user_manager.get_username(oauth2_session)
+        print(username)
+        assert username == GOOD_USERNAME
+
+
+
+
+
+
+
+
+
+
+
+
+

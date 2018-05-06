@@ -38,7 +38,8 @@ from access token has to be in JSON therefore you can also set some headers for
 plugin obtaining access token.
 
 Resource servers use different keywords for username (e.g. name, username, user_id, login).
-For plugin you need to specify that with `username_key`
+For plugin you need to specify that with `username_key`. After that you need to specify `access_token_query_key`.
+That settings option is because some resource server needs query parameter "access_token" and some only "token".
 
 ```yaml
 oauth2:
@@ -46,6 +47,7 @@ oauth2:
   token_path: https://github.com/login/oauth/access_token
   user_info_path: https://api.github.com/user
   username_key: login
+  access_token_query_key: access_token
   token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
     Accept: application/json
 ```
@@ -61,6 +63,7 @@ oauth2:
   token_path: https://github.com/login/oauth/access_token
   user_info_path: https://api.github.com/user
   username_key: login
+  access_token_query_key: access_token
   token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
     Accept: application/json
   http://localhost:5000/: #redirect_uri
@@ -77,6 +80,7 @@ plugins:
     token_path: https://github.com/login/oauth/access_token
     user_info_path: https://api.github.com/user
     username_key: login
+    access_token_query_key: access_token
     token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
       Accept: application/json
     http://localhost:5000/: #redirect_uri from
@@ -119,7 +123,9 @@ or in [%AppData%](https://www.howtogeek.com/318177/what-is-the-appdata-folder-in
  4. **username_key:** You need to provide, how the user would be logged in. Note: This username has to be unique,
  because it is stored in the users.yaml, where settings for this user are stored.
  ![User login name](user_info_github.png)
- 5. **token_headers:** This plugin requires info in [JSON](https://en.wikipedia.org/wiki/JSON) format,
+ 5. **access_token_query_key:** Some resource server have different specification how to get data about user.
+ For example github has query parameter: `access_token`. Other server might have query parameter just `token`
+ 6. **token_headers:** This plugin requires info in [JSON](https://en.wikipedia.org/wiki/JSON) format,
  for github you need to specify that with a header that is post to get `access_token`
  
  So now our `config.yaml` look like this:
@@ -130,6 +136,7 @@ plugins: # List of your plugins and their configurations. If it is missing, add 
     token_path: https://github.com/login/oauth/access_token
     user_info_path: https://api.github.com/user
     username_key: login
+    access_token_query_key: access_token
     token_headers:
       Accept: application/json
 ```
@@ -142,7 +149,7 @@ for personal reasons you want `redirect_uri` to be "http://localhost:5000/".
 The problem is, that you specified the `redirect_uri` to be "http://127.0.0.1:5000/
  and the authentication fails.
 
- 6. **redirect_uri_first:**
+ 7. **redirect_uri_first:**
     1. **client_id:** your_client_id_first
     2. **client_secret:** your_client_secret_first
     
@@ -158,6 +165,7 @@ plugins:
     token_path: https://github.com/login/oauth/access_token
     user_info_path: https://api.github.com/user
     username_key: login
+    access_token_query_key: access_token
     token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
       Accept: application/json
     http://localhost:5000/: #redirect_uri where you run OctoPrint

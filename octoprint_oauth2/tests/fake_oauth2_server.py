@@ -26,25 +26,15 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import json
 import socket
 import SocketServer
-import time
 import urlparse
-
-CLIENT_ID = "abc"
-CLIENT_SECRET = "xyz"
-REDIRECT_URI = "http://0.0.0.0:5000/"
-
-GOOD_USERNAME = "good"
-BAD_USERNAME = "bad"
-
-GOOD_CODE = "goodcode"
-BAD_CODE = "badcode"
-
-GOOD_ACCESS_TOKEN = "goodAT"
-BAD_ACCESS_TOKEN = "badAT"
+import pprint
+from urlparse import urlparse, parse_qs
+from constants_for_tests import *
+import requests
 
 
 def parse_info(info):
-	print("parser")
+	# print("parser")
 	parsed = urlparse.urlparse(info)
 	data = dict(urlparse.parse_qsl(parsed.query))
 	return data
@@ -55,6 +45,10 @@ class TokenHandler(BaseHTTPRequestHandler):
 		self.send_response(200)
 		self.send_header('Content-Type', 'application/json;charset=UTF-8')
 		self.end_headers()
+
+	def print_all(self):
+		# print(self.client_address)
+		print(self.command)
 
 	def authorize(self, info):
 		print (info['client_id'])
@@ -95,9 +89,16 @@ class TokenHandler(BaseHTTPRequestHandler):
 		return data
 
 	# access token input
-	def fake_user_info(self, username):
+	def fake_user_info(self, info):
+		# get username
+		print("--------info--------")
+		print(info)
+		print("--------------------")
 
-		data = {'username': username}
+		data = {'login': GOOD_USERNAME}
+
+		# data = info
+		# data = {'username': username}
 
 		return data
 
@@ -123,10 +124,26 @@ class TokenHandler(BaseHTTPRequestHandler):
 		if self.path.startswith('/authorize'):
 			info = parse_info(self.path)
 			data = self.authorize(info)
-		else:
+		elif self.path.startswith('/user'):
+			print("-----2222------")
 			print(self.path)
-			username = self.path.split('/')[-1]
-			data = self.fake_user_info(username)
+			print (self.headers)
+			query = parse_qs(urlparse(self.path).query)
+			print query
+			# print (self.responses)
+			print (self.connection)
+			# length = int(self.headers.getheader('content-length'))
+			# print ("length = " + length)
+			# data_string = urlparse.parse_qs(self)
+			pprint.pprint (self)
+			# data_string = self.rfile.read(length)
+			# print data_string
+			info = parse_info(self.path)
+			data = self.fake_user_info(info)
+		else:
+			print("-----3333------")
+			print(self.path)
+			data = None
 
 		print("GET sending data:")
 		print(data)

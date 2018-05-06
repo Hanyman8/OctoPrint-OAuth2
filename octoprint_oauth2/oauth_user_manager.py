@@ -1,5 +1,7 @@
 from octoprint.users import *
 from requests_oauthlib import OAuth2Session
+import json
+import requests
 
 
 class OAuthbasedUserManager(FilebasedUserManager):
@@ -12,6 +14,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		self.PATH_FOR_TOKEN = self.oauth2["token_path"]
 		self.PATH_USER_INFO = self.oauth2["user_info_path"]
 		self.USERNAME_KEY = self.oauth2["username_key"]
+		self.ACCESS_TOKEN_QUERY_KEY = self.oauth2["access_token_query_key"]
 		try:
 			self.TOKEN_HEADERS = self.oauth2["token_headers"]
 		except KeyError:
@@ -31,6 +34,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		UserManager.logout_user(self, user)
 
 	def get_token(self, oauth2_session, code):
+		print ("get token")
 		try:
 			token_json = oauth2_session.fetch_token(self.PATH_FOR_TOKEN,
 												authorization_response="authorization_code",
@@ -41,6 +45,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
 			try:
 				# token is OK
 				access_token = token_json["access_token"]
+				print ("acesstoken=" + access_token)
 				return access_token
 			except KeyError:
 				try:
@@ -56,22 +61,39 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 		return None
 
-	def get_username(self, oauth2_session, access_token):
+	def get_username(self, oauth2_session):
 
-		# GET user data from resource server
-		response = oauth2_session.get(self.PATH_USER_INFO)
-		data = response.json()
 
-		# Try if data contains USERNAME_KEY from config file
 		try:
-			login = data[self.USERNAME_KEY]
-			return login
-		except KeyError:
-			logging.getLogger("octoprint.plugins." + __name__).error("User data does not contain username key:" + self.USERNAME_KEY)
+			# GET user data from resource server
+			print ("get username")
+			params = {
+				self.ACCESS_TOKEN_QUERY_KEY: oauth2_session.access_token
+			}
+			response = requests.get(self.PATH_USER_INFO, params=params)
+
+			data = response.json()
+
+			print(json.dumps(data, indent=2,sort_keys=True))
+
+			# Try if data contains USERNAME_KEY from config file
+			try:
+				login = data[self.USERNAME_KEY]
+				print ("--getusername---")
+				print (login)
+				return login
+			except KeyError:
+				print ("BAD LOGIN")
+				logging.getLogger("octoprint.plugins." + __name__).error("User data does not contain username key:" + self.USERNAME_KEY)
+		except:
+			print("error")
+			logging.getLogger("octoprint.plugins." + __name__).error(
+				"error")
 
 		return None
 
 	def login_user(self, user):
+		print ("login user")
 
 		self._cleanup_sessions()
 
@@ -97,7 +119,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
 			if access_token is None:
 				return None
 
-			username = self.get_username(oauth2_session, access_token)
+			username = self.get_username(oauth2_session)
 			user = FilebasedUserManager.findUser(self, username)
 			if username is None:
 				logging.getLogger("octoprint.plugins." + __name__).error("Username none")
