@@ -73,7 +73,8 @@ class OAuthbasedUserManager(FilebasedUserManager):
 				login = data[self.USERNAME_KEY]
 				return login
 			except KeyError:
-				logging.getLogger("octoprint.plugins." + __name__).error("User data does not contain username key:" + self.USERNAME_KEY)
+				logging.getLogger("octoprint.plugins." + __name__).error("User data does not contain username key, you can try to find it here:")
+				logging.getLogger("octoprint.plugins." + __name__).error(data)
 		except:
 			logging.getLogger("octoprint.plugins." + __name__).error(
 				"error")
