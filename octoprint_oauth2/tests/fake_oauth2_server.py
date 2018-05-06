@@ -98,13 +98,14 @@ class TokenHandler(BaseHTTPRequestHandler):
 				print("Token and key is OK")
 				data = {GOOD_USERNAME_KEY: GOOD_USERNAME}
 				return data
-
-			elif info[BAD_ACCESS_TOKEN_QUERY_KEY] is not None:
-				print("Bad access token query key")
-				return None
 		except:
-			print("Bad access token")
-			return None
+			try:
+				if info[BAD_ACCESS_TOKEN_QUERY_KEY] is not None:
+					print("Bad access token query key")
+					return None
+			except:
+				print("Bad access token")
+				return None
 
 
 	def do_POST(self):
