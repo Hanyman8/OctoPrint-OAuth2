@@ -28,15 +28,16 @@ import socket
 import SocketServer
 import urlparse
 import pprint
-from urlparse import urlparse, parse_qs
+from urlparse import parse_qs
 from constants_for_tests import *
 import requests
 
 
 def parse_info(info):
-	# print("parser")
+	print("parser")
 	parsed = urlparse.urlparse(info)
 	data = dict(urlparse.parse_qsl(parsed.query))
+	print(data)
 	return data
 
 
@@ -91,16 +92,20 @@ class TokenHandler(BaseHTTPRequestHandler):
 	# access token input
 	def fake_user_info(self, info):
 		# get username
-		print("--------info--------")
-		print(info)
-		print("--------------------")
 
-		data = {'login': GOOD_USERNAME}
+		try:
+			if info[GOOD_ACCESS_TOKEN_QUERY_KEY] == GOOD_ACCESS_TOKEN:
+				print("Token and key is OK")
+				data = {GOOD_USERNAME_KEY: GOOD_USERNAME}
+				return data
 
-		# data = info
-		# data = {'username': username}
+			elif info[BAD_ACCESS_TOKEN_QUERY_KEY] is not None:
+				print("Bad access token query key")
+				return None
+		except:
+			print("Bad access token")
+			return None
 
-		return data
 
 	def do_POST(self):
 		print("POST method")
@@ -109,6 +114,7 @@ class TokenHandler(BaseHTTPRequestHandler):
 		if self.path.startswith('/token'):
 			data_string = self.rfile.read(int(self.headers['Content-Length']))
 			data_string = "/token?" + data_string
+			print("datastring = " + data_string )
 			info = parse_info(data_string)
 			data = self.fake_access_token(info)
 		else:
@@ -120,6 +126,7 @@ class TokenHandler(BaseHTTPRequestHandler):
 
 	def do_GET(self):
 		print("GET method")
+
 		self._set_headers()
 		if self.path.startswith('/authorize'):
 			info = parse_info(self.path)
@@ -127,17 +134,6 @@ class TokenHandler(BaseHTTPRequestHandler):
 		elif self.path.startswith('/user'):
 			print("-----2222------")
 			print(self.path)
-			print (self.headers)
-			query = parse_qs(urlparse(self.path).query)
-			print query
-			# print (self.responses)
-			print (self.connection)
-			# length = int(self.headers.getheader('content-length'))
-			# print ("length = " + length)
-			# data_string = urlparse.parse_qs(self)
-			pprint.pprint (self)
-			# data_string = self.rfile.read(length)
-			# print data_string
 			info = parse_info(self.path)
 			data = self.fake_user_info(info)
 		else:

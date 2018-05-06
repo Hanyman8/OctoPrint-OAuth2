@@ -6,6 +6,7 @@ from requests_oauthlib import OAuth2Session
 from constants_for_tests import *
 from octoprint_oauth2.oauth_user_manager import OAuthbasedUserManager
 from octoprint_oauth2.tests.fake_oauth2_server import serve_forever
+import octoprint_oauth2.tests.constants_for_tests
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -24,7 +25,8 @@ class TestUserManager:
         cls.user_manager.CLIENT_ID = "abc"
         cls.user_manager.CLIENT_SECRET = "xyz"
         cls.user_manager.TOKEN_HEADERS = {"Accept": "application/json"}
-        cls.user_manager.USERNAME_KEY = "login"
+        cls.user_manager.USERNAME_KEY = GOOD_USERNAME_KEY
+        cls.user_manager.ACCESS_TOKEN_QUERY_KEY = GOOD_ACCESS_TOKEN_QUERY_KEY
         cls.user_manager.PATH_USER_INFO = "http://0.0.0.0:8080/user"
         cls.user_manager.PATH_FOR_TOKEN = "http://0.0.0.0:8080/token"
 
@@ -44,6 +46,7 @@ class TestUserManager:
 
     def test_get_username_good(self):
         oauth2_session = OAuth2Session(self.user_manager.CLIENT_ID, redirect_uri=self.user_manager.REDIRECT_URI)
+        print(self.user_manager.ACCESS_TOKEN_QUERY_KEY)
         oauth2_session.access_token = GOOD_ACCESS_TOKEN
         username = self.user_manager.get_username(oauth2_session)
         print(username)
