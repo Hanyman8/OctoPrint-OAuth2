@@ -44,20 +44,20 @@ $(function() {
 
         self.loginState.login = function () {
 
-            var oauth_plugin_settings = self.settings.settings.plugins.oauth2;
+            const oauth_plugin_settings = self.settings.settings.plugins.oauth2;
 
-            var redirect_uri = parseUrl(window.location.href).origin + "/";
+            const redirect_uri = parseUrl(window.location.href).origin + "/";
 
-            var client_id = oauth_plugin_settings[redirect_uri].client_id();
-            var login_path = oauth_plugin_settings.login_path();
+            const client_id = oauth_plugin_settings[redirect_uri].client_id();
+            const login_path = oauth_plugin_settings.login_path();
 
-            var state = guid();
+            const state = guid();
             // setting state to local storage
             localStorage.setItem("state", state);
 
-            var params = ['response_type=code', 'client_id=' + client_id, 'redirect_uri=' + redirect_uri, 'state=' + state];
-            var query = params.join('&');
-            var url = login_path + "?" + query;
+            const params = ['response_type=code', 'client_id=' + client_id, 'redirect_uri=' + redirect_uri, 'state=' + state];
+            const query = params.join('&');
+            const url = login_path + "?" + query;
 
             window.location.replace(url);
         };
@@ -91,17 +91,17 @@ $(function() {
            }
         });
 
-        var code = getParameterByName("code",window.location.href);
-        var stateFromOAuth = getParameterByName("state", window.location.href);
+        const code = getParameterByName("code",window.location.href);
+        const stateFromOAuth = getParameterByName("state", window.location.href);
 
 
         if(!!stateFromOAuth && !!code){
-            var state = localStorage.getItem("state");
+            const state = localStorage.getItem("state");
             localStorage.removeItem("state");
             if (stateFromOAuth != state) {
                 alert("State sent to oauth server is not same. Possible attack");
                 return;
-            };
+            }
 
             var url = parseUrl(window.location.href).origin + "/";
 
