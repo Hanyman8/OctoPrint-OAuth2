@@ -1,6 +1,11 @@
 CLIENT_ID = "abc"
 CLIENT_SECRET = "xyz"
-REDIRECT_URI = "http://0.0.0.0:5000/"
+
+GOOD_REDIRECT_URI = "http://0.0.0.0:5000/"
+BAD_REDIRECT_URI = "1.2.3.4"
+
+PATH_USER_INFO = "http://0.0.0.0:8080/user"
+PATH_FOR_TOKEN = "http://0.0.0.0:8080/token"
 
 GOOD_USERNAME_KEY = "goodkey"
 BAD_USERNAME_KEY = "badkey"

@@ -9,6 +9,12 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		logging.getLogger("octoprint.plugins." + __name__).info("#######2222######")
 		self._components = components
 		self._settings = settings
+
+		import pprint
+		pprint.pprint(components)
+		print ("--------------------------------------")
+		pprint.pprint(settings)
+
 		# Get data from config file
 		self.oauth2 = self._settings.get(["plugins", "oauth2"])
 		self.PATH_FOR_TOKEN = self.oauth2["token_path"]
@@ -21,7 +27,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
 			self.TOKEN_HEADERS = None
 
 		# These three will be initialized later.
-		# CLIENT_ID and CLIENT_SECRET need REDIRECT_URI for proper initialization
+		# CLIENT_ID and CLIENT_SECRET need GOOD_REDIRECT_URI for proper initialization
 		self.CLIENT_ID = None
 		self.CLIENT_SECRET = None
 		self.REDIRECT_URI = None
