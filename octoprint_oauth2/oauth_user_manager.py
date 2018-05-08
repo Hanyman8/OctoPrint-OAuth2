@@ -1,7 +1,7 @@
-from octoprint.users import *
-from requests_oauthlib import OAuth2Session
-import json
 import requests
+from requests_oauthlib import OAuth2Session
+
+from octoprint.users import *
 
 
 class OAuthbasedUserManager(FilebasedUserManager):

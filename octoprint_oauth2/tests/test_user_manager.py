@@ -1,14 +1,13 @@
 import threading
 
+import time
 import os
 from requests_oauthlib import OAuth2Session
 
 from constants_for_tests import *
+from octoprint.users import *
 from octoprint_oauth2.oauth_user_manager import OAuthbasedUserManager
 from octoprint_oauth2.tests.fake_oauth2_server import serve_forever
-from octoprint.users import *
-import octoprint.server
-from  pytest_mock import mocker
 
 
 # time.sleep(1)
@@ -20,11 +19,13 @@ class TestUserManager:
 		thr = threading.Thread(target=serve_forever, args=[8080])
 		thr.daemon = True
 		thr.start()
+		time.sleep(1)
 
 	def tmp(self):
 		return True
 
 	def init_user_manager(self):
+
 		user_manager = OAuthbasedUserManager.__new__(OAuthbasedUserManager)
 		user_manager.REDIRECT_URI = GOOD_REDIRECT_URI
 		user_manager.CLIENT_ID = CLIENT_ID

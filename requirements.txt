@@ -1,3 +1,5 @@
+requests
+octoprint
 ###
 # This file is only here to make sure that something like
 #
