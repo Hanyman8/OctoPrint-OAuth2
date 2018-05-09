@@ -18,9 +18,10 @@ import pytest
 @pytest.fixture(scope='session')
 def start_servers():
 	print ("starting servers")
+	os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 	try:
 		# start resource server
-		resource_server = threading.Thread(target=serve_forever, args=[8181])
+		resource_server = threading.Thread(target=serve_forever, args=[8080])
 		resource_server.daemon = True
 		resource_server.start()
 		# # start provider
@@ -28,10 +29,11 @@ def start_servers():
 		oauth_provider.daemon = True
 		oauth_provider.start()
 		# sleep so server can startup
-		time.sleep(1)
+		time.sleep(2)
 		yield oauth_provider
 	finally:
-		print ("321")
+		os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
 
 @pytest.fixture
 def driver(start_servers):
@@ -43,10 +45,30 @@ def driver(start_servers):
 
 #
 def test_login(driver):
-	driver.get("http://0.0.0.0:5000/")
+	driver.get(GOOD_REDIRECT_URI)
 	print ("TEST SELENIUM")
 	driver.find_element_by_id("navbar_plugin_oauth2").click()
 	driver.find_element_by_id("loginForm").click()
+	driver.find_element_by_id("confirm").click()
+	title = driver.find_element_by_xpath("//*[@title='Logged in as mistrhanus.cz']")
+	assert title is not None
+
+
+def test_logout(driver):
+	driver.get(GOOD_REDIRECT_URI)
+	driver.find_element_by_id("navbar_plugin_oauth2").click()
+	driver.find_element_by_id("loginForm").click()
+	driver.find_element_by_id("confirm").click()
+	label = "Ignore"
+	try:
+		while driver.find_element_by_xpath("//button[contains(.,'" + label + "')]") is not None:
+			driver.find_element_by_xpath("//button[contains(.,'" + label + "')]").click()
+	except:
+		pass
+	driver.find_element_by_id("navbar_plugin_oauth2").click()
+	driver.find_element_by_id("logout_button").click()
+	form = driver.find_element_by_id("loginForm")
+	assert form is not None
 #
 # def test_bla(driver):
 # 	print ("1234")

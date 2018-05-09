@@ -115,9 +115,11 @@ class TokenHandler(BaseHTTPRequestHandler):
 			# print(self.path)
 			info = parse_info(self.path)
 			data = self.fake_user_info(info)
+
+		# this server as fake resource server for selenium integration tests
 		elif self.path.startswith('/api/login'):
 			print("-----api/user------")
-			data = {'username': 'MirekHroncok'}
+			data = {'username': 'mistrhanus.cz'}
 		else:
 			# print("-----3333------")
 			print(self.path)

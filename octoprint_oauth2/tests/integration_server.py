@@ -38,10 +38,10 @@ class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
 <html>
     <body>
         <p>
-            <a href="{url}&confirm=1">confirm</a>
+            <a id="confirm" href="{url}&confirm=1">confirm</a>
         </p>
         <p>
-            <a href="{url}&confirm=0">deny</a>
+            <a id="deny" href="{url}&confirm=0">deny</a>
         </p>
     </body>
 </html>
