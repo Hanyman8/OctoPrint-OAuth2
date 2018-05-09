@@ -1,13 +1,13 @@
-var glob;
 $(function() {
 
+    // function to parse URL
     function parseUrl(url) {
-        var parser = document.createElement('a');
+        const parser = document.createElement('a');
         parser.href = url;
-
         return parser;
     }
 
+    // source: https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
     function guid() {
       function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -17,7 +17,7 @@ $(function() {
       return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
     }
 
-
+    // source: https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
     function getParameterByName(name, url) {
         if (!url) url = window.location.href;
         name = name.replace(/[\[\]]/g, "\\$&");
@@ -69,7 +69,7 @@ $(function() {
                 .done(function(response) {
 
                     new PNotify({title: gettext("Logout from OctoPrint successful"), text: gettext("You are now logged out"), type: "success"});
-                    new PNotify({title: gettext("OAuth Logout"), text: gettext("To log out completely, make sure to log out from OAuth provider: " + provider), hide: false});
+                    new PNotify({title: gettext("OAuth 2.0 Logout"), text: gettext("To log out completely, make sure to log out from OAuth 2.0 provider: " + provider), hide: false});
 
                     self.loginState.fromResponse(response);
                 })
@@ -87,7 +87,7 @@ $(function() {
                return self.loginState.username();
            }
            else {
-               return gettext("Login via OAuth");
+               return gettext("Login via OAuth 2.0");
            }
         });
 
@@ -109,7 +109,7 @@ $(function() {
                 .done(function (response) {
                     new PNotify({
                         title: gettext("Login OK"),
-                        text: _.sprintf(gettext('OAuth Logged as "%(username)s"'),
+                        text: _.sprintf(gettext('OAuth 2.0 Logged as "%(username)s"'),
                             {username: response.name}), type:"success"});
                     self.loginState.fromResponse(response);
                     self.loginState.loginUser("");

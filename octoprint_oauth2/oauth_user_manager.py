@@ -10,11 +10,6 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		self._components = components
 		self._settings = settings
 
-		import pprint
-		pprint.pprint(components)
-		print ("--------------------------------------")
-		pprint.pprint(settings)
-
 		# Get data from config file
 		self.oauth2 = self._settings.get(["plugins", "oauth2"])
 		self.PATH_FOR_TOKEN = self.oauth2["token_path"]

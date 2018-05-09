@@ -1,5 +1,5 @@
 requests
-octoprint
+requests-oauthlib
 ###
 # This file is only here to make sure that something like
 #

@@ -13,7 +13,7 @@ class OAuth2Plugin(octoprint.plugin.StartupPlugin,
                    ):
     # Template plugin mixin
     def get_template_configs(self):
-        self._logger.info("************ Template configs *************")
+        self._logger.info("OAuth 2.0 get template configs")
         return [
             dict(type="navbar", template="oauth2_login.jinja2", custom_bindings=False, replaces="login"),
             dict(type="settings", custom_bindings=False)
@@ -21,7 +21,7 @@ class OAuth2Plugin(octoprint.plugin.StartupPlugin,
 
     # Asset plugin mixin
     def get_assets(self):
-        self._logger.info("****** getting Assets ******")
+        self._logger.info("OAuth 2.0 get assets")
         return dict(
             js=["js/oauth2.js"],
             css=["css/oauth2.css"]
@@ -32,7 +32,9 @@ class OAuth2Plugin(octoprint.plugin.StartupPlugin,
 
 
 def user_factory_hook(components, settings, *args, **kwargs):
-    logging.getLogger("octoprint.plugins." + __name__).info("#######111111######")
+    """Hook"""
+
+    logging.getLogger("octoprint.plugins." + __name__).info("OAuth 2.0 hooking OAuthBasedUserManager")
     return OAuthbasedUserManager(components, settings)
 
 
