@@ -33,7 +33,7 @@ plugin_url = "https://github.com/Hanyman8/OctoPrint-OAuth2"
 plugin_license = "AGPLv3"
 
 # Any additional requirements besides OctoPrint should be listed here
-plugin_requires = ["requests", "requests-oauthlib"]
+plugin_requires = []
 
 ### --------------------------------------------------------------------------------------------------------------------
 ### More advanced options that you usually shouldn't have to touch follow after this point
