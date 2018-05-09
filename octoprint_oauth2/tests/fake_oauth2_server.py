@@ -87,44 +87,44 @@ class TokenHandler(BaseHTTPRequestHandler):
 
 
 	def do_POST(self):
-		print("POST method")
+		# print("POST method")
 		self._set_headers()
 
 		if self.path.startswith('/token'):
 			data_string = self.rfile.read(int(self.headers['Content-Length']))
 			data_string = "/token?" + data_string
-			print("datastring = " + data_string )
+			# print("datastring = " + data_string )
 			info = parse_info(data_string)
 			data = self.fake_access_token(info)
 		else:
 			data = {"error": "no url here"}
 
-		print("POST sending data:")
-		print(data)
+		# print("POST sending data:")
+		# print(data)
 		self.wfile.write(json.dumps(data).encode())
 
 	def do_GET(self):
-		print("GET method")
+		# print("GET method")
 
 		self._set_headers()
 		if self.path.startswith('/authorize'):
 			info = parse_info(self.path)
 			data = self.authorize(info)
 		elif self.path.startswith('/user'):
-			print("-----2222------")
-			print(self.path)
+			# print("-----2222------")
+			# print(self.path)
 			info = parse_info(self.path)
 			data = self.fake_user_info(info)
 		elif self.path.startswith('/api/login'):
 			print("-----api/user------")
 			data = {'username': 'MirekHroncok'}
 		else:
-			print("-----3333------")
+			# print("-----3333------")
 			print(self.path)
 			data = None
 
-		print("GET sending data:")
-		print(data)
+		# print("GET sending data:")
+		# print(data)
 		self.wfile.write(json.dumps(data).encode())
 
 

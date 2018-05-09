@@ -65,7 +65,7 @@ class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
         return False
 
 
-def run_auth_server():
+def run_auth_server(port=8282):
     try:
         client_store = ClientStore()
         client_store.add_client(client_id="abc", client_secret="xyz",
@@ -84,7 +84,7 @@ def run_auth_server():
 
         app = Application(provider=provider)
 
-        httpd = make_server('', 8282, app, handler_class=OAuthRequestHandler)
+        httpd = make_server('', port, app, handler_class=OAuthRequestHandler)
 
         print("Starting OAuth2 server on http://localhost:8282/...")
         httpd.serve_forever()
@@ -92,8 +92,8 @@ def run_auth_server():
         httpd.server_close()
 
 
-def main():
-    auth_server = Process(target=run_auth_server)
+def oauth_serve(port=8282):
+    auth_server = Process(target=run_auth_server, args=[port])
     auth_server.start()
 
     def sigint_handler(signal, frame):
@@ -105,4 +105,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    oauth_serve()

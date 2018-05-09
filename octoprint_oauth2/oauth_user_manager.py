@@ -35,18 +35,15 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		UserManager.logout_user(self, user)
 
 	def get_token(self, oauth2_session, code):
-		print ("Get access token, code = " + code)
-		token_json = oauth2_session.fetch_token(self.PATH_FOR_TOKEN,
-												authorization_response="authorization_code",
-												code=code,
-												client_id=self.CLIENT_ID,
-												client_secret=self.CLIENT_SECRET,
-												headers=self.TOKEN_HEADERS)
-
 		try:
-			print ("1234")
+			token_json = oauth2_session.fetch_token(self.PATH_FOR_TOKEN,
+													authorization_response="authorization_code",
+													code=code,
+													client_id=self.CLIENT_ID,
+													client_secret=self.CLIENT_SECRET,
+													headers=self.TOKEN_HEADERS)
 
-			print token_json
+
 			try:
 				# token is OK
 				access_token = token_json["access_token"]
