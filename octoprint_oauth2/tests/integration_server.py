@@ -17,23 +17,24 @@ from oauth2.web import AuthorizationCodeGrantSiteAdapter
 from oauth2.web.wsgi import Application
 from oauth2.grant import AuthorizationCodeGrant
 
+
 class OAuthRequestHandler(WSGIRequestHandler):
-    """
+	"""
     Request handler that enables formatting of the log messages on the console.
     This handler is used by the python-oauth2 application.
     """
 
-    def address_string(self):
-        return "python-oauth2"
+	def address_string(self):
+		return "python-oauth2"
 
 
 class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
-    """
+	"""
     This adapter renders a confirmation page so the user can confirm the auth
     request.
     """
 
-    CONFIRMATION_TEMPLATE = """
+	CONFIRMATION_TEMPLATE = """
 <html>
     <body>
         <p>
@@ -46,63 +47,49 @@ class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
 </html>
     """
 
-    def render_auth_page(self, request, response, environ, scopes, client):
-        url = request.path + "?" + request.query_string
-        response.body = self.CONFIRMATION_TEMPLATE.format(url=url)
+	def render_auth_page(self, request, response, environ, scopes, client):
+		url = request.path + "?" + request.query_string
+		response.body = self.CONFIRMATION_TEMPLATE.format(url=url)
 
-        return response
+		return response
 
-    def authenticate(self, request, environ, scopes, client):
-        if request.method == "GET":
-            if request.get_param("confirm") == "1":
-                return
-        raise UserNotAuthenticated
+	def authenticate(self, request, environ, scopes, client):
+		if request.method == "GET":
+			if request.get_param("confirm") == "1":
+				return
+		raise UserNotAuthenticated
 
-    def user_has_denied_access(self, request):
-        if request.method == "GET":
-            if request.get_param("confirm") == "0":
-                return True
-        return False
+	def user_has_denied_access(self, request):
+		if request.method == "GET":
+			if request.get_param("confirm") == "0":
+				return True
+		return False
 
 
 def run_auth_server(port=8282):
-    try:
-        client_store = ClientStore()
-        client_store.add_client(client_id="abc", client_secret="xyz",
-                                redirect_uris=["http://0.0.0.0:5000/"])
+	print("Starting OAuth2 server on port:" + str(port))
 
-        token_store = TokenStore()
+	client_store = ClientStore()
+	client_store.add_client(client_id="abc", client_secret="xyz",
+							redirect_uris=["http://0.0.0.0:5000/"])
 
-        provider = Provider(
-            access_token_store=token_store,
-            auth_code_store=token_store,
-            client_store=client_store,
-            token_generator=Uuid4())
-        provider.add_grant(
-            AuthorizationCodeGrant(site_adapter=TestSiteAdapter())
-        )
+	token_store = TokenStore()
 
-        app = Application(provider=provider)
+	provider = Provider(
+		access_token_store=token_store,
+		auth_code_store=token_store,
+		client_store=client_store,
+		token_generator=Uuid4())
+	provider.add_grant(
+		AuthorizationCodeGrant(site_adapter=TestSiteAdapter())
+	)
 
-        httpd = make_server('', port, app, handler_class=OAuthRequestHandler)
+	app = Application(provider=provider)
 
-        print("Starting OAuth2 server on http://localhost:8282/...")
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        httpd.server_close()
+	httpd = make_server('', port, app, handler_class=OAuthRequestHandler)
 
-
-def oauth_serve(port=8282):
-    auth_server = Process(target=run_auth_server, args=[port])
-    auth_server.start()
-
-    def sigint_handler(signal, frame):
-        print("Terminating servers...")
-        auth_server.terminate()
-        auth_server.join()
-
-    signal.signal(signal.SIGINT, sigint_handler)
+	httpd.serve_forever()
 
 
 if __name__ == "__main__":
-    oauth_serve()
+	run_auth_server()
