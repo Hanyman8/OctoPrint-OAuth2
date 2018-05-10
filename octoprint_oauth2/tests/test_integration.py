@@ -35,27 +35,28 @@ def start_servers():
 		os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
-@pytest.fixture
-def driver(start_servers):
+def get_driver(start_servers):
 	# temporary for testing of testing
 	print ("setting driver")
 	driver = webdriver.Firefox(executable_path="/home/hany/Downloads/geckodriver")
 	driver.implicitly_wait(10)
+	driver.get(GOOD_REDIRECT_URI)
+
 	return driver
 
-#
-def test_login(driver):
-	driver.get(GOOD_REDIRECT_URI)
+
+def test_login(start_servers):
+	driver = get_driver(start_servers)
 	print ("TEST SELENIUM")
 	driver.find_element_by_id("navbar_plugin_oauth2").click()
 	driver.find_element_by_id("loginForm").click()
 	driver.find_element_by_id("confirm").click()
-	title = driver.find_element_by_xpath("//*[@title='Logged in as mistrhanus.cz']")
+	title = driver.find_element_by_xpath("//*[@title='Logged in as test_admin']")
 	assert title is not None
 
 
-def test_logout(driver):
-	driver.get(GOOD_REDIRECT_URI)
+def test_logout(start_servers):
+	driver = get_driver(start_servers)
 	driver.find_element_by_id("navbar_plugin_oauth2").click()
 	driver.find_element_by_id("loginForm").click()
 	driver.find_element_by_id("confirm").click()
@@ -69,6 +70,14 @@ def test_logout(driver):
 	driver.find_element_by_id("logout_button").click()
 	form = driver.find_element_by_id("loginForm")
 	assert form is not None
-#
-# def test_bla(driver):
-# 	print ("1234")
+
+def test_more_users(start_servers):
+	driver1 = get_driver(start_servers)
+	driver2 = get_driver(start_servers)
+	driver1.find_element_by_id("navbar_plugin_oauth2").click()
+	driver1.find_element_by_id("loginForm").click()
+	driver1.find_element_by_id("confirm").click()
+	time.sleep(5)
+	driver2.find_element_by_id("navbar_plugin_oauth2").click()
+	driver2.find_element_by_id("loginForm").click()
+	driver2.find_element_by_id("confirm").click()

@@ -6,9 +6,17 @@ import SocketServer
 import json
 import socket
 import urlparse
+import requests
 from BaseHTTPServer import BaseHTTPRequestHandler
 
 from constants_for_tests import *
+
+# hack for fake resource server
+try:
+	CONNECTED_CLIENTS
+except:
+	print("setting global")
+	CONNECTED_CLIENTS = 0
 
 
 def parse_info(info):
@@ -85,6 +93,19 @@ class TokenHandler(BaseHTTPRequestHandler):
 				print("Bad access token")
 				return None
 
+	def fake_resource_server(self, info):
+		print (info)
+
+		global CONNECTED_CLIENTS
+		print(CONNECTED_CLIENTS)
+		CONNECTED_CLIENTS =+ 1
+
+		if CONNECTED_CLIENTS == 1:
+			data = {'username': 'test_admin'}
+		else:
+			data = {'username': 'test_user'}
+
+		return data
 
 	def do_POST(self):
 		# print("POST method")
@@ -118,8 +139,10 @@ class TokenHandler(BaseHTTPRequestHandler):
 
 		# this server as fake resource server for selenium integration tests
 		elif self.path.startswith('/api/login'):
+
 			print("-----api/user------")
-			data = {'username': 'mistrhanus.cz'}
+			info = parse_info(self.path)
+			data = self.fake_resource_server(info)
 		else:
 			# print("-----3333------")
 			print(self.path)
