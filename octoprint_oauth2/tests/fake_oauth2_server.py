@@ -12,10 +12,6 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 from constants_for_tests import *
 
 # hack for fake resource server
-try:
-	connected_clients
-except:
-	connected_clients = 0
 
 
 def parse_info(info):
@@ -27,6 +23,9 @@ def parse_info(info):
 
 
 class TokenHandler(BaseHTTPRequestHandler):
+
+	connected_clients = 0
+
 	def _set_headers(self):
 		self.send_response(200)
 		self.send_header('Content-Type', 'application/json;charset=UTF-8')
@@ -95,11 +94,10 @@ class TokenHandler(BaseHTTPRequestHandler):
 	def fake_resource_server(self, info):
 		print (info)
 
-		global connected_clients
-		connected_clients += 1
-		print(connected_clients)
+		TokenHandler.connected_clients += 1
+		print(TokenHandler.connected_clients)
 
-		if connected_clients == 1:
+		if TokenHandler.connected_clients == 1:
 			data = {'username': 'test_admin'}
 		else:
 			data = {'username': 'test_user'}
@@ -152,7 +150,7 @@ class TokenHandler(BaseHTTPRequestHandler):
 		self.wfile.write(json.dumps(data).encode())
 
 
-class TCPServer(SocketServer.ForkingTCPServer):
+class TCPServer(SocketServer.TCPServer):
 	def server_bind(self):
 		self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.socket.bind(self.server_address)
