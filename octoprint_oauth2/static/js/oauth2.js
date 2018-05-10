@@ -51,6 +51,10 @@ $(function() {
             const client_id = oauth_plugin_settings[redirect_uri].client_id();
             const login_path = oauth_plugin_settings.login_path();
 
+            if(!client_id || !login_path){
+                alert("Probably bad configuration file");
+            }
+
             const state = guid();
             // setting state to local storage
             localStorage.setItem("state", state);

@@ -5,21 +5,22 @@ from octoprint.users import *
 
 
 class OAuthbasedUserManager(FilebasedUserManager):
+    logger = logging.getLogger("octoprint.plugins." + __name__)
     def __init__(self, components, settings):
-        logging.getLogger("octoprint.plugins." + __name__).info("Initializing OAuthbasedUserManager")
+        OAuthbasedUserManager.logger.info("Initializing OAuthbasedUserManager")
         self._components = components
         self._settings = settings
 
         # Get data from config file
         self.oauth2 = self._settings.get(["plugins", "oauth2"])
-        self.PATH_FOR_TOKEN = self.oauth2["token_path"]
-        self.PATH_USER_INFO = self.oauth2["user_info_path"]
-        self.USERNAME_KEY = self.oauth2["username_key"]
-        self.ACCESS_TOKEN_QUERY_KEY = self.oauth2["access_token_query_key"]
+        self.path_for_token = self.oauth2["token_path"]
+        self.path_user_info = self.oauth2["user_info_path"]
+        self.username_key = self.oauth2["username_key"]
+        self.access_token_query_key = self.oauth2["access_token_query_key"]
         try:
-            self.TOKEN_HEADERS = self.oauth2["token_headers"]
+            self.token_headers = self.oauth2["token_headers"]
         except KeyError:
-            self.TOKEN_HEADERS = None
+            self.token_headers = None
 
         # Init FilebasedUserManager, other methods are needed for OctoPrint
         FilebasedUserManager.__init__(self)
@@ -31,7 +32,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
         :param user:
         :return:
         """
-        logging.getLogger("octoprint.plugins." + __name__).info("OAuth Logging out")
+        OAuthbasedUserManager.logger.info("OAuth Logging out")
         UserManager.logout_user(self, user)
 
     def get_token(self, oauth2_session, code, client_id, client_secret):
@@ -45,14 +46,14 @@ class OAuthbasedUserManager(FilebasedUserManager):
         :param client_secret:
         :return: access_token
         """
+
         try:
-            token_json = oauth2_session.fetch_token(self.PATH_FOR_TOKEN,
+            token_json = oauth2_session.fetch_token(self.path_for_token,
                                                     authorization_response="authorization_code",
                                                     code=code,
                                                     client_id=client_id,
                                                     client_secret=client_secret,
-                                                    headers=self.TOKEN_HEADERS)
-
+                                                    headers=self.token_headers)
 
             try:
                 # token is OK
@@ -61,18 +62,19 @@ class OAuthbasedUserManager(FilebasedUserManager):
             except KeyError:
                 try:
                     error = token_json["error"]
-                    logging.getLogger("octoprint.plugins." + __name__).error("Error of access token: " + error)
-                except:
-                    logging.getLogger("octoprint.plugins." + __name__).error("Error of access token, error message not found")
+                    OAuthbasedUserManager.logger.error("Error of access token: " + error)
+                except KeyError:
+                    OAuthbasedUserManager.logger.error("Error of access token, error message not found")
 
         except:
-            logging.getLogger("octoprint.plugins." + __name__).error("Bad authorization_code")
+            OAuthbasedUserManager.logger.error("Bad authorization_code")
 
         return None
 
     def get_username(self, oauth2_session):
         """
-        This method make a request to resource server. Then tries if specific username_key is OK and return username.
+        This method make a request to resource server.
+        Then tries if specific username_key is OK and return username.
 
         :param oauth2_session:
         :return: username
@@ -81,20 +83,21 @@ class OAuthbasedUserManager(FilebasedUserManager):
         try:
             # GET user data from resource server
             params = {
-                self.ACCESS_TOKEN_QUERY_KEY: oauth2_session.access_token
+                self.access_token_query_key: oauth2_session.access_token
             }
-            response = requests.get(self.PATH_USER_INFO, params=params)
+            response = requests.get(self.path_user_info, params=params)
             data = response.json()
 
-            # Try if data contains USERNAME_KEY from config file
+            # Try if data contains username_key from config file
             try:
-                login = data[self.USERNAME_KEY]
+                login = data[self.username_key]
                 return login
             except KeyError:
-                logging.getLogger("octoprint.plugins." + __name__).error("User data does not contain username key, you can try to find it here:")
-                logging.getLogger("octoprint.plugins." + __name__).error(data)
+                OAuthbasedUserManager.logger.error("User data does not contain username key,"
+                                  "you can try to find it here:")
+                OAuthbasedUserManager.logger.error(data)
         except:
-            logging.getLogger("octoprint.plugins." + __name__).error(
+            OAuthbasedUserManager.logger.error(
                 "error")
 
         return None
@@ -106,7 +109,8 @@ class OAuthbasedUserManager(FilebasedUserManager):
         It is obtained by view model in static/js folder.
         Method gets specified data from config yaml - client_id and client_secret, then
         start OAuth2Session from requests_oauthlib library. Using the library method
-        fetch the access token using method get_token. After that, user is added into users.yaml config file.
+        fetch the access token using method get_token.
+        After that, user is added into users.yaml config file.
 
         :param user:
         :return: user
@@ -127,10 +131,11 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
             # from get_id we get for each user his redirect uri and code
             try:
+                print (user.get_id())
                 redirect_uri = user.get_id()['redirect_uri']
                 code = user.get_id()['code']
             except:
-                logging.getLogger("octoprint.plugins." + __name__).error("Code or redirect_uri not found")
+                OAuthbasedUserManager.logger.error("Code or redirect_uri not found")
                 return None
 
             client_id = self.oauth2[redirect_uri]["client_id"]
@@ -144,7 +149,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
             username = self.get_username(oauth2_session)
             if username is None:
-                logging.getLogger("octoprint.plugins." + __name__).error("Username none")
+                OAuthbasedUserManager.logger.error("Username none")
                 return None
             user = FilebasedUserManager.findUser(self, username)
 
@@ -173,12 +178,13 @@ class OAuthbasedUserManager(FilebasedUserManager):
         :param password:
         :return: True
         """
-        logging.getLogger("octoprint.plugins." + __name__).info("Logging in via OAuth 2.0")
+        OAuthbasedUserManager.logger.info("Logging in via OAuth 2.0")
         return True
 
     def findUser(self, userid=None, apikey=None, session=None):
         """
-        Find user using FilebasedUserManager, else set temporary user. This is beacuse of implementation of server/api.
+        Find user using FilebasedUserManager, else set temporary user.
+        This is beacuse of implementation of server/api.
 
         :param userid:
         :param apikey:

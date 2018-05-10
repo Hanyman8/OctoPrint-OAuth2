@@ -11,8 +11,6 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 
 from constants_for_tests import *
 
-# hack for fake resource server
-
 
 def parse_info(info):
     print("parser")
@@ -23,7 +21,7 @@ def parse_info(info):
 
 
 class TokenHandler(BaseHTTPRequestHandler):
-
+    # hack for fake resource server
     connected_clients = 0
 
     def _set_headers(self):

@@ -1,18 +1,13 @@
+import threading
+import time
+
+import os
+import pytest
+from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
+from constants_for_tests import *
 from fake_oauth2_server import serve_forever
 from integration_server import run_auth_server
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-
-from constants_for_tests import *
-
-import threading
-import os, signal
-import time
-import pytest
 
 
 @pytest.fixture(scope='session')
@@ -64,13 +59,15 @@ def test_logout(start_servers):
     try:
         while driver.find_element_by_xpath("//button[contains(.,'" + label + "')]") is not None:
             driver.find_element_by_xpath("//button[contains(.,'" + label + "')]").click()
-    except:
+    except WebDriverException:
         pass
     driver.find_element_by_id("navbar_plugin_oauth2").click()
     driver.find_element_by_id("logout_button").click()
     form = driver.find_element_by_id("loginForm")
     assert form is not None
 
+
+# Method for driver to change user permissions in OctoPrint
 def change_test_user_rights(driver):
     driver.find_element_by_id("navbar_settings").click()
     time.sleep(2)
@@ -78,10 +75,10 @@ def change_test_user_rights(driver):
     try:
         while driver.find_element_by_xpath("//button[contains(.,'Ignore')]") is not None:
             driver.find_element_by_xpath("//button[contains(.,'Ignore')]").click()
-    except:
+    except WebDriverException:
         pass
-    element = driver.find_element_by_xpath \
-        ("//td//*[contains(text(), 'test_user')]/../following-sibling::td[3]/a[1]").click()
+    element = driver.find_element_by_xpath(
+        "//td//*[contains(text(), 'test_user')]/../following-sibling::td[3]/a[1]").click()
     time.sleep(1)
     driver.find_element_by_id("settings-usersDialogEditUserAdmin").click()
     driver.find_element_by_xpath(
@@ -90,6 +87,7 @@ def change_test_user_rights(driver):
     driver.find_element_by_xpath("//button[contains(text(),'Save')]//i/..").click()
     time.sleep(1)
     return driver
+
 
 # Test login more users and add role admin
 def test_more_users(start_servers):
@@ -101,7 +99,7 @@ def test_more_users(start_servers):
     driver1.find_element_by_id("confirm").click()
     title = driver1.find_element_by_xpath("//*[@title='Logged in as test_admin']")
     assert title is not None
-    # time.sleep(5)
+    time.sleep(2)
     # # login user
     driver2.find_element_by_id("navbar_plugin_oauth2").click()
     driver2.find_element_by_id("loginForm").click()

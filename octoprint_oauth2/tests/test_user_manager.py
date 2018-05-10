@@ -11,8 +11,6 @@ from octoprint_oauth2.tests.fake_oauth2_server import serve_forever
 import pytest
 
 
-# time.sleep(1)
-
 @pytest.fixture(scope='session')
 def fake_oauth_server():
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -29,77 +27,56 @@ def fake_oauth_server():
 @pytest.fixture
 def user_manager(fake_oauth_server):
     user_manager = OAuthbasedUserManager.__new__(OAuthbasedUserManager)
-    user_manager.REDIRECT_URI = GOOD_REDIRECT_URI
-    user_manager.CLIENT_ID = CLIENT_ID
-    user_manager.CLIENT_SECRET = CLIENT_SECRET
-    user_manager.TOKEN_HEADERS = {"Accept": "application/json"}
-    user_manager.USERNAME_KEY = GOOD_USERNAME_KEY
-    user_manager.ACCESS_TOKEN_QUERY_KEY = GOOD_ACCESS_TOKEN_QUERY_KEY
-    user_manager.PATH_USER_INFO = PATH_USER_INFO
-    user_manager.PATH_FOR_TOKEN = PATH_FOR_TOKEN
+    user_manager.token_headers = {"Accept": "application/json"}
+    user_manager.username_key = GOOD_USERNAME_KEY
+    user_manager.access_token_query_key = GOOD_ACCESS_TOKEN_QUERY_KEY
+    user_manager.path_user_info = PATH_USER_INFO
+    user_manager.path_for_token = PATH_FOR_TOKEN
 
-    # mock some OctoPrint values, cleanup session needs callable
+    # Mock some OctoPrint values, cleanup session needs callable
     user_manager._cleanup_sessions = lambda: True
     user_manager._session_users_by_session = {}
     user_manager._sessionids_by_userid = {}
     user_manager._users = {}
     user_manager._save = lambda: True
+    user_manager.addUser = lambda x, y, z, k: True
     return user_manager
 
 @pytest.fixture
 def oauth2_session(user_manager):
-    return OAuth2Session(user_manager.CLIENT_ID, redirect_uri=user_manager.REDIRECT_URI)
+    return OAuth2Session(CLIENT_ID, redirect_uri=GOOD_REDIRECT_URI)
 
 
 def test_get_access_token_good(oauth2_session, user_manager):
-    access_token = user_manager.get_token(oauth2_session, GOOD_CODE)
+    access_token = user_manager.get_token(oauth2_session, GOOD_CODE, CLIENT_ID, CLIENT_SECRET)
     assert access_token == GOOD_ACCESS_TOKEN
-    assert access_token != None
-    assert access_token != BAD_ACCESS_TOKEN
+
 
 def test_get_access_token_bad(oauth2_session, user_manager):
-    access_token = user_manager.get_token(oauth2_session, BAD_CODE)
+    access_token = user_manager.get_token(oauth2_session, BAD_CODE, CLIENT_ID, CLIENT_SECRET)
     assert access_token == None
-    assert access_token != GOOD_ACCESS_TOKEN
-    assert access_token != ""
+
 
 def test_get_username_good(oauth2_session, user_manager):
     oauth2_session.access_token = GOOD_ACCESS_TOKEN
     username = user_manager.get_username(oauth2_session)
     print(username)
     assert username == GOOD_USERNAME
-    assert username != None
-    assert username != ""
+
 
 def test_get_username_bad_access_token(oauth2_session, user_manager):
     oauth2_session.access_token = BAD_ACCESS_TOKEN
     username = user_manager.get_username(oauth2_session)
     assert username is None
-    assert username != ""
-    assert username != GOOD_USERNAME
+
 
 def test_get_username_bad_query_key(oauth2_session, user_manager):
-    user_manager.ACCESS_TOKEN_QUERY_KEY = BAD_ACCESS_TOKEN_QUERY_KEY
+    user_manager.access_token_query_key = BAD_ACCESS_TOKEN_QUERY_KEY
     oauth2_session.access_token = GOOD_ACCESS_TOKEN
     username = user_manager.get_username(oauth2_session)
+    print username
     assert username is None
-    assert username != ""
-    assert username != GOOD_USERNAME
 
-def test_passing_redirect_uri(oauth2_session, user_manager):
-    # set temporarily bad redirect URI
-    user_manager.REDIRECT_URI = BAD_REDIRECT_URI
-    assert user_manager.REDIRECT_URI == BAD_REDIRECT_URI
-
-    # use checkPassword method to set good redirect URI
-    assert user_manager.checkPassword("not_used", GOOD_REDIRECT_URI) is True
-    assert user_manager.REDIRECT_URI == GOOD_REDIRECT_URI
-    assert user_manager.REDIRECT_URI != BAD_REDIRECT_URI
-
-    # set it back to bad
-    assert user_manager.checkPassword("not_used", BAD_REDIRECT_URI)
-    assert user_manager.REDIRECT_URI != GOOD_REDIRECT_URI
-    assert user_manager.REDIRECT_URI == BAD_REDIRECT_URI
 
 def test_login_session(oauth2_session, user_manager):
     user = User(GOOD_USERNAME, "1234", 1, ["user"])
@@ -112,9 +89,12 @@ def test_login_session(oauth2_session, user_manager):
     assert user_check.get_id() != BAD_USERNAME
     assert user.is_user() is True
 
+
 def test_oauth2_login_good(oauth2_session, user_manager):
-    # code is passed as argument from server api
-    user = User(GOOD_CODE, "1234", 1, ["user"])
+    # code and redirect_uri is passed as argument from server api
+    params = {'code': GOOD_CODE,
+              'redirect_uri': GOOD_REDIRECT_URI}
+    user = User(params, "1234", 1, ["user"])
 
     # mock settings from config.yaml
     user_manager.oauth2 = {GOOD_REDIRECT_URI: {"client_id": CLIENT_ID,
