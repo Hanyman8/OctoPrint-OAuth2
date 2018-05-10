@@ -13,10 +13,9 @@ from constants_for_tests import *
 
 # hack for fake resource server
 try:
-	CONNECTED_CLIENTS
+	connected_clients
 except:
-	print("setting global")
-	CONNECTED_CLIENTS = 0
+	connected_clients = 0
 
 
 def parse_info(info):
@@ -96,11 +95,11 @@ class TokenHandler(BaseHTTPRequestHandler):
 	def fake_resource_server(self, info):
 		print (info)
 
-		global CONNECTED_CLIENTS
-		print(CONNECTED_CLIENTS)
-		CONNECTED_CLIENTS =+ 1
+		global connected_clients
+		connected_clients += 1
+		print(connected_clients)
 
-		if CONNECTED_CLIENTS == 1:
+		if connected_clients == 1:
 			data = {'username': 'test_admin'}
 		else:
 			data = {'username': 'test_user'}

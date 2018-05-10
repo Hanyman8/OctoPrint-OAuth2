@@ -29,7 +29,7 @@ def start_servers():
 		oauth_provider.daemon = True
 		oauth_provider.start()
 		# sleep so server can startup
-		time.sleep(2)
+		time.sleep(4)
 		yield oauth_provider
 	finally:
 		os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -45,31 +45,31 @@ def get_driver(start_servers):
 	return driver
 
 
-def test_login(start_servers):
-	driver = get_driver(start_servers)
-	print ("TEST SELENIUM")
-	driver.find_element_by_id("navbar_plugin_oauth2").click()
-	driver.find_element_by_id("loginForm").click()
-	driver.find_element_by_id("confirm").click()
-	title = driver.find_element_by_xpath("//*[@title='Logged in as test_admin']")
-	assert title is not None
-
-
-def test_logout(start_servers):
-	driver = get_driver(start_servers)
-	driver.find_element_by_id("navbar_plugin_oauth2").click()
-	driver.find_element_by_id("loginForm").click()
-	driver.find_element_by_id("confirm").click()
-	label = "Ignore"
-	try:
-		while driver.find_element_by_xpath("//button[contains(.,'" + label + "')]") is not None:
-			driver.find_element_by_xpath("//button[contains(.,'" + label + "')]").click()
-	except:
-		pass
-	driver.find_element_by_id("navbar_plugin_oauth2").click()
-	driver.find_element_by_id("logout_button").click()
-	form = driver.find_element_by_id("loginForm")
-	assert form is not None
+# def test_login(start_servers):
+# 	driver = get_driver(start_servers)
+# 	print ("TEST SELENIUM")
+# 	driver.find_element_by_id("navbar_plugin_oauth2").click()
+# 	driver.find_element_by_id("loginForm").click()
+# 	driver.find_element_by_id("confirm").click()
+# 	title = driver.find_element_by_xpath("//*[@title='Logged in as test_admin']")
+# 	assert title is not None
+#
+#
+# def test_logout(start_servers):
+# 	driver = get_driver(start_servers)
+# 	driver.find_element_by_id("navbar_plugin_oauth2").click()
+# 	driver.find_element_by_id("loginForm").click()
+# 	driver.find_element_by_id("confirm").click()
+# 	label = "Ignore"
+# 	try:
+# 		while driver.find_element_by_xpath("//button[contains(.,'" + label + "')]") is not None:
+# 			driver.find_element_by_xpath("//button[contains(.,'" + label + "')]").click()
+# 	except:
+# 		pass
+# 	driver.find_element_by_id("navbar_plugin_oauth2").click()
+# 	driver.find_element_by_id("logout_button").click()
+# 	form = driver.find_element_by_id("loginForm")
+# 	assert form is not None
 
 def test_more_users(start_servers):
 	driver1 = get_driver(start_servers)
