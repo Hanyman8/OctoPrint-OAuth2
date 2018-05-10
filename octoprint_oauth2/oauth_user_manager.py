@@ -6,7 +6,7 @@ from octoprint.users import *
 
 class OAuthbasedUserManager(FilebasedUserManager):
 	def __init__(self, components, settings):
-		logging.getLogger("octoprint.plugins." + __name__).info("#######2222######")
+		logging.getLogger("octoprint.plugins." + __name__).info("Initializing OAuthbasedUserManager")
 		self._components = components
 		self._settings = settings
 
@@ -21,12 +21,6 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		except KeyError:
 			self.TOKEN_HEADERS = None
 
-		# These three will be initialized later.
-		# CLIENT_ID and CLIENT_SECRET need GOOD_REDIRECT_URI for proper initialization
-		self.CLIENT_ID = None
-		self.CLIENT_SECRET = None
-		self.REDIRECT_URI = None
-
 		# Init FilebasedUserManager, other methods are needed for OctoPrint
 		FilebasedUserManager.__init__(self)
 
@@ -34,20 +28,19 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		logging.getLogger("octoprint.plugins." + __name__).info("OAuth Logging out")
 		UserManager.logout_user(self, user)
 
-	def get_token(self, oauth2_session, code):
+	def get_token(self, oauth2_session, code, client_id, client_secret):
 		try:
 			token_json = oauth2_session.fetch_token(self.PATH_FOR_TOKEN,
 													authorization_response="authorization_code",
 													code=code,
-													client_id=self.CLIENT_ID,
-													client_secret=self.CLIENT_SECRET,
+													client_id=client_id,
+													client_secret=client_secret,
 													headers=self.TOKEN_HEADERS)
 
 
 			try:
 				# token is OK
 				access_token = token_json["access_token"]
-				print(access_token)
 				return access_token
 			except KeyError:
 				try:
@@ -99,13 +92,20 @@ class OAuthbasedUserManager(FilebasedUserManager):
 			return None
 
 		if not isinstance(user, SessionUser):
-			code = user.get_id()
 
-			self.CLIENT_ID = self.oauth2[self.REDIRECT_URI]["client_id"]
-			self.CLIENT_SECRET = self.oauth2[self.REDIRECT_URI]["client_secret"]
-			oauth2_session = OAuth2Session(self.CLIENT_ID,
-										   redirect_uri=self.REDIRECT_URI)
-			access_token = self.get_token(oauth2_session, code)
+			# from get_id we get for each user his redirect uri and code
+			try:
+				redirect_uri = user.get_id()['redirect_uri']
+				code = user.get_id()['code']
+			except:
+				logging.getLogger("octoprint.plugins." + __name__).error("Code or redirect_uri not found")
+				return None
+
+			client_id = self.oauth2[redirect_uri]["client_id"]
+			client_secret = self.oauth2[redirect_uri]["client_secret"]
+			oauth2_session = OAuth2Session(client_id,
+										   redirect_uri=redirect_uri)
+			access_token = self.get_token(oauth2_session, code, client_id, client_secret)
 
 			if access_token is None:
 				return None
@@ -146,7 +146,6 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
 	def checkPassword(self, username, password):
 		logging.getLogger("octoprint.plugins." + __name__).info("Logging in via OAuth 2.0")
-		self.REDIRECT_URI = password
 		return True
 
 	def findUser(self, userid=None, apikey=None, session=None):

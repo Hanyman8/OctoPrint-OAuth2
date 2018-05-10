@@ -103,9 +103,15 @@ $(function() {
                 return;
             }
 
-            var url = parseUrl(window.location.href).origin + "/";
+            const url = parseUrl(window.location.href).origin + "/";
+            const parameters = {"code": code,
+                                "redirect_uri": url};
 
-            OctoPrint.browser.login(code, url, false)
+            // for each user we need to send specific redirect uri,
+            // this parametr we need to in user manager method login_user
+            // which is called in server/api (called by browser.login)
+            // so we send this in dict and parse it later
+            OctoPrint.browser.login(parameters, "unused", false)
                 .done(function (response) {
                     new PNotify({
                         title: gettext("Login OK"),
