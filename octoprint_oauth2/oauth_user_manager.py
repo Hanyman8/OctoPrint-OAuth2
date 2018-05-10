@@ -25,10 +25,26 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		FilebasedUserManager.__init__(self)
 
 	def logout_user(self, user):
+		"""
+		Prints log into console, then uses UserManager.logout_user
+
+		:param user:
+		:return:
+		"""
 		logging.getLogger("octoprint.plugins." + __name__).info("OAuth Logging out")
 		UserManager.logout_user(self, user)
 
 	def get_token(self, oauth2_session, code, client_id, client_secret):
+		"""
+		This method use oauth2_session to fetch access token from authorization server.
+		if the token_json contains 'access_token' then it returns it.
+
+		:param oauth2_session:
+		:param code:
+		:param client_id:
+		:param client_secret:
+		:return: access_token
+		"""
 		try:
 			token_json = oauth2_session.fetch_token(self.PATH_FOR_TOKEN,
 													authorization_response="authorization_code",
@@ -55,7 +71,12 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		return None
 
 	def get_username(self, oauth2_session):
+		"""
+		This method make a request to resource server. Then tries if specific username_key is OK and return username.
 
+		:param oauth2_session:
+		:return: username
+		"""
 
 		try:
 			# GET user data from resource server
@@ -79,6 +100,17 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		return None
 
 	def login_user(self, user):
+		"""
+		This method logs in the user into OctoPrint using authorization OAuth2.
+		Users user.get_id() should be dict containing redirect_uri and code.
+		It is obtained by view model in static/js folder.
+		Method gets specified data from config yaml - client_id and client_secret, then
+		start OAuth2Session from requests_oauthlib library. Using the library method
+		fetch the access token using method get_token. After that, user is added into users.yaml config file.
+
+		:param user:
+		:return: user
+		"""
 		self._cleanup_sessions()
 
 		if user is None:
@@ -132,24 +164,26 @@ class OAuthbasedUserManager(FilebasedUserManager):
 		self._sessionids_by_userid[user_id].add(user.session)
 		return user
 
-	def addUser(self, username, password, active=False, roles=None, apikey=None, overwrite=False):
-		if not roles:
-			roles = ["user"]
-
-		if username in self._users.keys() and not overwrite:
-			raise UserAlreadyExists(username)
-
-		# Add user with password and not creating passwordhash.
-		self._users[username] = User(username, password, active, roles, apikey=apikey)
-		self._dirty = True
-		self._save()
-
 	def checkPassword(self, username, password):
+		"""
+		Override checkPassword method. Return always true. Use authorization of OAuth 2.0 instead
+
+		:param username:
+		:param password:
+		:return: True
+		"""
 		logging.getLogger("octoprint.plugins." + __name__).info("Logging in via OAuth 2.0")
 		return True
 
 	def findUser(self, userid=None, apikey=None, session=None):
+		"""
+		Find user using FilebasedUserManager, else set temporary user. This is beacuse of implementation of server/api.
 
+		:param userid:
+		:param apikey:
+		:param session:
+		:return: user
+		"""
 		user = FilebasedUserManager.findUser(self, userid, apikey, session)
 		if user is not None:
 			return user
