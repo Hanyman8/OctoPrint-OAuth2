@@ -35,6 +35,7 @@ def start_servers():
     finally:
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
+
 def change_test_user_rights(driver):
     """
     Method for driver to change user permissions in OctoPrint
@@ -62,7 +63,6 @@ def change_test_user_rights(driver):
     return driver
 
 
-
 def get_driver(start_servers):
     """
     Prepare Selenium driver
@@ -88,7 +88,7 @@ def test_login(start_servers):
     driver.find_element_by_id("confirm").click()
     title = driver.find_element_by_xpath("//*[@title='Logged in as test_admin']")
     assert title is not None
-
+    driver.quit()
 
 def test_logout(start_servers):
     """
@@ -110,6 +110,7 @@ def test_logout(start_servers):
     driver.find_element_by_id("logout_button").click()
     form = driver.find_element_by_id("loginForm")
     assert form is not None
+    driver.quit()
 
 
 def test_more_users(start_servers):
@@ -134,6 +135,9 @@ def test_more_users(start_servers):
     title2 = driver2.find_element_by_xpath("//*[@title='Logged in as test_user']")
     assert title2 is not None
 
+    #sleep and refresh to fetch settings from users.yaml
+    driver1.get(GOOD_REDIRECT_URI)
+    time.sleep(2)
     # add admin role to test_user
     change_test_user_rights(driver1)
     driver2.get(GOOD_REDIRECT_URI)
@@ -146,3 +150,5 @@ def test_more_users(start_servers):
     driver2.get(GOOD_REDIRECT_URI)
     settings = driver2.find_element_by_id("navbar_settings")
     assert settings.is_displayed() is False
+    driver1.quit()
+    driver2.quit()
