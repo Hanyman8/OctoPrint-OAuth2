@@ -12,6 +12,8 @@ or manually using this URL:
 
 You can install it via pip.
 
+**Important:** Plugin is tested only on OctoPrint version 1.3.8
+
 After installing plugin, you also need to configure your config.yaml and users.yaml
 files. They are stored configuration folder (e.g. `~/.octoprint/` on Linux)`
 
