@@ -39,9 +39,6 @@ class OAuthbasedUserManager(FilebasedUserManager):
     def logout_user(self, user):
         """
         Prints log into console, then uses UserManager.logout_user
-
-        :param user:
-        :return:
         """
         OAuthbasedUserManager.logger.info("OAuth Logging out")
         UserManager.logout_user(self, user)
@@ -49,13 +46,8 @@ class OAuthbasedUserManager(FilebasedUserManager):
     def get_token(self, oauth2_session, code, client_id, client_secret):
         """
         This method use oauth2_session to fetch access token from authorization server.
-        if the token_json contains 'access_token' then it returns it.
-
-        :param oauth2_session:
-        :param code:
-        :param client_id:
-        :param client_secret:
-        :return: access_token
+        if the token_json contains 'access_token' then it returns it. If access_token is missing,
+        or something is wrong, return None
         """
 
         try:
@@ -87,9 +79,6 @@ class OAuthbasedUserManager(FilebasedUserManager):
         """
         This method make a request to resource server.
         Then tries if specific username_key is OK and return username.
-
-        :param oauth2_session:
-        :return: username
         """
 
         try:
@@ -123,9 +112,6 @@ class OAuthbasedUserManager(FilebasedUserManager):
         start OAuth2Session from requests_oauthlib library. Using the library method
         fetch the access token using method get_token.
         After that, user is added into users.yaml config file.
-
-        :param user:
-        :return: user
         """
         self._cleanup_sessions()
 
@@ -183,10 +169,6 @@ class OAuthbasedUserManager(FilebasedUserManager):
     def checkPassword(self, username, password):
         """
         Override checkPassword method. Return always true. Use authorization of OAuth 2.0 instead
-
-        :param username:
-        :param password:
-        :return: True
         """
         OAuthbasedUserManager.logger.info("Logging in via OAuth 2.0")
         return True
@@ -194,12 +176,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
     def findUser(self, userid=None, apikey=None, session=None):
         """
         Find user using FilebasedUserManager, else set temporary user.
-        This is beacuse of implementation of server/api.
-
-        :param userid:
-        :param apikey:
-        :param session:
-        :return: user
+        This is because of implementation of server/api.
         """
         user = FilebasedUserManager.findUser(self, userid, apikey, session)
         if user is not None:

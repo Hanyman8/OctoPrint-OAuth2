@@ -19,8 +19,6 @@ class OAuth2Plugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplatePlug
     def get_template_configs(self):
         """
         Plugin sets used templates
-
-        :return:
         """
         self._logger.info("OAuth 2.0 get template configs")
         return [dict(type="navbar", template="oauth2_login.jinja2",
@@ -30,8 +28,6 @@ class OAuth2Plugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplatePlug
     def get_assets(self):
         """
         Plugin sets assets
-
-        :return: dict
         """
 
         self._logger.info("OAuth 2.0 get assets")
@@ -42,8 +38,6 @@ class OAuth2Plugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplatePlug
     def get_settings_restricted_paths(self):
         """
         Plugin set restricted paths of config.yaml
-
-        :return: dict
         """
 
         return dict(admin=[["plugins", "oauth2"], ])
@@ -52,12 +46,6 @@ class OAuth2Plugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplatePlug
 def user_factory_hook(components, settings, *args, **kwargs):
     """
     User factory hook, to inititialize OAuthBasedUserManager, which controls login users
-
-    :param components:
-    :param settings:
-    :param args:
-    :param kwargs:
-    :return: OAuthbasedUserManager
     """
 
     logging.getLogger("octoprint.plugins." + __name__).info(

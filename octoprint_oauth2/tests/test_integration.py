@@ -16,8 +16,7 @@ from octoprint_oauth2.tests.integration_server import run_auth_server
 @pytest.fixture(scope='session')
 def start_servers():
     """
-    Start OAuth provider and fake resource server
-    :return:
+    Start OAuth provider and fake resource server fixture
     """
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     try:
@@ -39,8 +38,6 @@ def start_servers():
 def change_test_user_rights(driver):
     """
     Method for driver to change user permissions in OctoPrint
-    :param driver:
-    :return:
     """
     driver.find_element_by_id("navbar_settings").click()
     time.sleep(2)
@@ -66,8 +63,6 @@ def change_test_user_rights(driver):
 def get_driver(start_servers):
     """
     Prepare Selenium driver
-    :param start_servers:
-    :return:
     """
     # temporary for testing of testing
     driver = webdriver.Firefox(executable_path="/home/hany/Downloads/geckodriver")
@@ -79,8 +74,6 @@ def get_driver(start_servers):
 def test_login(start_servers):
     """
     Test login user via Selenium
-    :param start_servers:
-    :return:
     """
     driver = get_driver(start_servers)
     driver.find_element_by_id("navbar_plugin_oauth2").click()
@@ -93,8 +86,6 @@ def test_login(start_servers):
 def test_logout(start_servers):
     """
     Login, then test logout user
-    :param start_servers:
-    :return:
     """
     driver = get_driver(start_servers)
     driver.find_element_by_id("navbar_plugin_oauth2").click()
@@ -116,8 +107,6 @@ def test_logout(start_servers):
 def test_more_users(start_servers):
     """
     Test login more users and add role admin
-    :param start_servers:
-    :return:
     """
     driver1 = get_driver(start_servers)
     driver2 = get_driver(start_servers)

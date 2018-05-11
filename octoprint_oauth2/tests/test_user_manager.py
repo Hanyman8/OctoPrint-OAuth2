@@ -20,7 +20,6 @@ from octoprint_oauth2.tests.fake_oauth2_server import serve_forever
 def fake_oauth_server():
     """
     Server fake oauth2 provider fixture
-    :return:
     """
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     try:
@@ -37,8 +36,6 @@ def fake_oauth_server():
 def user_manager(fake_oauth_server):
     """
     Init OauthbasedUserManager for testing purposes
-    :param fake_oauth_server:
-    :return:
     """
     user_manager = OAuthbasedUserManager.__new__(OAuthbasedUserManager)
     user_manager.token_headers = {"Accept": "application/json"}
@@ -59,42 +56,22 @@ def user_manager(fake_oauth_server):
 @pytest.fixture
 def oauth2_session(user_manager):
     """
-    Ficture to make OAuth2 session
-    :param user_manager:
-    :return:
+    Fixture to make OAuth2 session
     """
     return OAuth2Session(CLIENT_ID, redirect_uri=GOOD_REDIRECT_URI)
 
 
 def test_get_access_token_good(oauth2_session, user_manager):
-    """
-    Test if authorization code is good
-    :param oauth2_session:
-    :param user_manager:
-    :return:
-    """
     access_token = user_manager.get_token(oauth2_session, GOOD_CODE, CLIENT_ID, CLIENT_SECRET)
     assert access_token == GOOD_ACCESS_TOKEN
 
 
 def test_get_access_token_bad(oauth2_session, user_manager):
-    """
-    Test if authorization code is bas
-    :param oauth2_session:
-    :param user_manager:
-    :return:
-    """
     access_token = user_manager.get_token(oauth2_session, BAD_CODE, CLIENT_ID, CLIENT_SECRET)
     assert access_token == None
 
 
 def test_get_username_good(oauth2_session, user_manager):
-    """
-    Test if passing good access token gets good username
-    :param oauth2_session:
-    :param user_manager:
-    :return:
-    """
     oauth2_session.access_token = GOOD_ACCESS_TOKEN
     username = user_manager.get_username(oauth2_session)
     print(username)
@@ -102,24 +79,12 @@ def test_get_username_good(oauth2_session, user_manager):
 
 
 def test_get_username_bad_access_token(oauth2_session, user_manager):
-    """
-    Test good username with passing bad access_token
-    :param oauth2_session:
-    :param user_manager:
-    :return:
-    """
     oauth2_session.access_token = BAD_ACCESS_TOKEN
     username = user_manager.get_username(oauth2_session)
     assert username is None
 
 
 def test_get_username_bad_query_key(oauth2_session, user_manager):
-    """
-    Test bad access token query key
-    :param oauth2_session:
-    :param user_manager:
-    :return:
-    """
     user_manager.access_token_query_key = BAD_ACCESS_TOKEN_QUERY_KEY
     oauth2_session.access_token = GOOD_ACCESS_TOKEN
     username = user_manager.get_username(oauth2_session)
@@ -127,13 +92,7 @@ def test_get_username_bad_query_key(oauth2_session, user_manager):
     assert username is None
 
 
-def test_login_session(oauth2_session, user_manager):
-    """
-    Test if session is already made
-    :param oauth2_session:
-    :param user_manager:
-    :return:
-    """
+def test_login_session(user_manager):
     user = User(GOOD_USERNAME, "1234", 1, ["user"])
     # make session
     user = SessionUser(user)
@@ -145,13 +104,7 @@ def test_login_session(oauth2_session, user_manager):
     assert user.is_user() is True
 
 
-def test_oauth2_login_good(oauth2_session, user_manager):
-    """
-    test login user
-    :param oauth2_session:
-    :param user_manager:
-    :return:
-    """
+def test_oauth2_login_good(user_manager):
     # code and redirect_uri is passed as argument from server api
     params = {'code': GOOD_CODE,
               'redirect_uri': GOOD_REDIRECT_URI}

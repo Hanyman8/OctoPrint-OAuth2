@@ -19,8 +19,6 @@ from octoprint_oauth2.tests.constants_for_tests import CLIENT_ID, GOOD_CODE, GOO
 def parse_info(info):
     """
     Parse info
-    :param info:
-    :return:
     """
     print("parser")
     parsed = urlparse.urlparse(info)
@@ -32,8 +30,6 @@ def parse_info(info):
 def fake_resource_server(info):
     """
     Simulate fake resource server for integration tests
-    :param info:
-    :return:
     """
     print(info)
 
@@ -52,8 +48,6 @@ def fake_resource_server(info):
 def fake_access_token(info):
     """
     Simulate authorization server
-    :param info:
-    :return:
     """
     print("Making fake access_token")
 
@@ -79,10 +73,7 @@ def fake_access_token(info):
 def fake_user_info(info):
     """
     Simulate resource server for unit tests
-    :param info:
-    :return:
     """
-
     try:
         if info[GOOD_ACCESS_TOKEN_QUERY_KEY] == GOOD_ACCESS_TOKEN:
             print("Token and key is OK")
@@ -101,8 +92,6 @@ def fake_user_info(info):
 def authorize(info):
     """
     Simulate login user on third party server
-    :param info:
-    :return:
     """
     print(info['client_id'])
     try:
@@ -134,7 +123,6 @@ class TokenHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         """
         Do POST method
-        :return:
         """
         self._set_headers()
 
@@ -154,7 +142,6 @@ class TokenHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         """
         Do GET method
-        :return:
         """
         self._set_headers()
         if self.path.startswith('/authorize'):
