@@ -1,11 +1,22 @@
+"""
+This file manages OAuthbasedUserManager. A hook for OctoPrint plugin.
+"""
+import logging
+
 import requests
 from requests_oauthlib import OAuth2Session
+from oauthlib.oauth2 import MissingTokenError
 
-from octoprint.users import *
+
+from octoprint.users import FilebasedUserManager, User, UserManager, LocalProxy, SessionUser
 
 
 class OAuthbasedUserManager(FilebasedUserManager):
+    """
+    OAuthbasedUserManager replaces OctoPrints FilebasedUserManager
+    """
     logger = logging.getLogger("octoprint.plugins." + __name__)
+
     def __init__(self, components, settings):
         OAuthbasedUserManager.logger.info("Initializing OAuthbasedUserManager")
         self._components = components
@@ -62,11 +73,12 @@ class OAuthbasedUserManager(FilebasedUserManager):
             except KeyError:
                 try:
                     error = token_json["error"]
-                    OAuthbasedUserManager.logger.error("Error of access token: " + error)
+                    OAuthbasedUserManager.logger.error("Error of access token: %s", error)
                 except KeyError:
-                    OAuthbasedUserManager.logger.error("Error of access token, error message not found")
+                    OAuthbasedUserManager.logger.error("Error of access token, "
+                                                       "error message not found")
 
-        except:
+        except MissingTokenError:
             OAuthbasedUserManager.logger.error("Bad authorization_code")
 
         return None
@@ -94,9 +106,9 @@ class OAuthbasedUserManager(FilebasedUserManager):
                 return login
             except KeyError:
                 OAuthbasedUserManager.logger.error("User data does not contain username key,"
-                                  "you can try to find it here:")
+                                                   "you can try to find it here:")
                 OAuthbasedUserManager.logger.error(data)
-        except:
+        except requests.RequestException:
             OAuthbasedUserManager.logger.error(
                 "error")
 
@@ -131,10 +143,9 @@ class OAuthbasedUserManager(FilebasedUserManager):
 
             # from get_id we get for each user his redirect uri and code
             try:
-                print (user.get_id())
                 redirect_uri = user.get_id()['redirect_uri']
                 code = user.get_id()['code']
-            except:
+            except KeyError:
                 OAuthbasedUserManager.logger.error("Code or redirect_uri not found")
                 return None
 
@@ -153,7 +164,6 @@ class OAuthbasedUserManager(FilebasedUserManager):
                 return None
             user = FilebasedUserManager.findUser(self, username)
 
-
             if user is None:
                 self.addUser(username, "", True, ["user"])
                 user = self.findUser(username)
@@ -164,7 +174,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
         self._session_users_by_session[user.session] = user
 
         user_id = user.get_id()
-        if not user_id in self._sessionids_by_userid:
+        if user_id not in self._sessionids_by_userid:
             self._sessionids_by_userid[user_id] = set()
 
         self._sessionids_by_userid[user_id].add(user.session)
