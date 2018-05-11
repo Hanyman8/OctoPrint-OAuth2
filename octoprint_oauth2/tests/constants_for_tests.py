@@ -1,3 +1,6 @@
+"""
+Constants for testing oauth2 plugin
+"""
 CLIENT_ID = "abc"
 CLIENT_SECRET = "xyz"
 

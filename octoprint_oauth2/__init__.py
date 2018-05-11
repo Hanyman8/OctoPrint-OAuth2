@@ -1,16 +1,20 @@
+"""
+This initialize plugin for authorization using framework OAuth 2.0
+for application OctoPrint
+"""
 # coding=utf-8
 from __future__ import absolute_import
-
-from octoprint_oauth2.oauth_user_manager import OAuthbasedUserManager
-import octoprint.plugin
 import logging
+import octoprint.plugin
+from octoprint_oauth2.oauth_user_manager import OAuthbasedUserManager
 
 
-class OAuth2Plugin(octoprint.plugin.StartupPlugin,
-                   octoprint.plugin.TemplatePlugin,
-                   octoprint.plugin.SettingsPlugin,
-                   octoprint.plugin.AssetPlugin
-                   ):
+class OAuth2Plugin(octoprint.plugin.StartupPlugin, octoprint.plugin.TemplatePlugin,
+                   octoprint.plugin.SettingsPlugin, octoprint.plugin.AssetPlugin):
+    """
+    Class for OAuth2 plugin for application OctoPrint
+    """
+
     # Template plugin mixin
     def get_template_configs(self):
         """
@@ -19,7 +23,8 @@ class OAuth2Plugin(octoprint.plugin.StartupPlugin,
         :return:
         """
         self._logger.info("OAuth 2.0 get template configs")
-        return [dict(type="navbar", template="oauth2_login.jinja2", custom_bindings=False, replaces="login")]
+        return [dict(type="navbar", template="oauth2_login.jinja2",
+                     custom_bindings=False, replaces="login")]
 
     # Asset plugin mixin
     def get_assets(self):
@@ -55,7 +60,8 @@ def user_factory_hook(components, settings, *args, **kwargs):
     :return: OAuthbasedUserManager
     """
 
-    logging.getLogger("octoprint.plugins." + __name__).info("OAuth 2.0 hooking OAuthBasedUserManager")
+    logging.getLogger("octoprint.plugins." + __name__).info(
+        "OAuth 2.0 hooking OAuthBasedUserManager")
     return OAuthbasedUserManager(components, settings)
 
 

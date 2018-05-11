@@ -104,7 +104,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
             try:
                 login = data[self.username_key]
                 return login
-            except KeyError:
+            except (KeyError, TypeError):
                 OAuthbasedUserManager.logger.error("User data does not contain username key,"
                                                    "you can try to find it here:")
                 OAuthbasedUserManager.logger.error(data)
