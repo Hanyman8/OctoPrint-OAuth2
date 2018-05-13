@@ -200,4 +200,70 @@ manually change your `users.py` file.
 If you need more information about configuring OctoPrint see its [documentation.](http://docs.octoprint.org/en/master/configuration/index.html)
 
 
-# OctoPrint-OAuth2
+## Testing
+
+This plugin contains also unit tests using [pytest](https://docs.pytest.org/en/latest/) and integration test using [Selenium.](https://www.seleniumhq.org/) 
+
+To run tests you need to install via pip `test_requirements.txt` in octoprint_oauth2/tests/ folder.
+
+### Unit tests
+Unit tests are testing new user manager for OAuth 2.0 authentication. To start them, in the base directory run
+
+    python -m pytest octoprint_oauth2/tests/test_user_manager.py
+    
+### Integration tests
+These tests are written for Selenium. It starts a Firefox web page and then checks if there are specific
+elements to click them. To run them, you need to download a [geckodriver](https://github.com/mozilla/geckodriver/releases)
+and add it it into PATH in constants_for_tests.py in test folder. Example is:
+
+    PATH_TO_GECKO_DRIVER = "/home/hany/Downloads/geckodriver"
+    
+Then for testing integration you have to temporarily set this value before you start OctoPrint:
+    
+    export OAUTHLIB_INSECURE_TRANSPORT=1
+    
+Reason why is described [here.](https://stackoverflow.com/questions/27785375/testing-flask-oauthlib-locally-without-https)
+
+After that you need to run OctoPrint with specific `config.yaml` and `users.yaml` file. `config.yaml`:
+
+```yaml
+plugins:
+  oauth2:
+    login_path: http://localhost:8282/authorize
+    token_path: http://localhost:8282/token
+    user_info_path: http://localhost:8080/api/login
+    username_key: username
+    access_token_query_key: access_token
+    token_headers: # plugin needs access token in JSON, on some servers we need to configure it.
+      Accept: application/json
+    http://0.0.0.0:5000/: #redirect_uri where you run OctoPrint
+      client_id: abc
+      client_secret: xyz
+```
+
+In `users.yaml`, you need to have user named `test_admin` with admin rights. Then **not** have a user
+with `test_user` username with admin rights. This user could be in `users.yaml` file, but it can **not**
+have admin rights.
+
+In `users.yaml` file you can have your own users. `users.yaml` can look like this:
+```yaml
+test_admin:
+  active: true
+  apikey: null
+  password: ''
+  roles:
+  - user
+  - admin
+  settings: {}
+```
+
+
+
+
+
+
+
+
+
+    
+    
