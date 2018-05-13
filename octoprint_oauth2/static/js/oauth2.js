@@ -96,7 +96,8 @@ $(function() {
         });
 
         const code = getParameterByName("code",window.location.href);
-        const stateFromOAuth = getParameterByName("state", window.location.href);
+        const stateFromOAuth = getParameterByName("state",
+            window.location.href);
 
 
         if(!!stateFromOAuth && !!code){

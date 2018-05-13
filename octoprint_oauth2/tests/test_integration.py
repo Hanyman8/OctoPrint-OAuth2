@@ -8,7 +8,7 @@ import os
 import pytest
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
-from octoprint_oauth2.tests.constants_for_tests import GOOD_REDIRECT_URI
+from octoprint_oauth2.tests.constants_for_tests import GOOD_REDIRECT_URI, PATH_TO_GECKO_DRIVER
 from octoprint_oauth2.tests.fake_oauth2_server import serve_forever
 from octoprint_oauth2.tests.integration_server import run_auth_server
 
@@ -65,9 +65,10 @@ def get_driver(start_servers):
     Prepare Selenium driver
     """
     # temporary for testing of testing
-    driver = webdriver.Firefox(executable_path="/home/hany/Downloads/geckodriver")
+    driver = webdriver.Firefox(executable_path= PATH_TO_GECKO_DRIVER)
     driver.implicitly_wait(10)
     driver.get(GOOD_REDIRECT_URI)
+    driver.maximize_window()
     return driver
 
 

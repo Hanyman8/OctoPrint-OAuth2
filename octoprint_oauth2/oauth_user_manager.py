@@ -5,7 +5,7 @@ import logging
 
 import requests
 from requests_oauthlib import OAuth2Session
-from oauthlib.oauth2 import MissingTokenError
+from oauthlib.oauth2 import OAuth2Error
 
 
 from octoprint.users import FilebasedUserManager, User, UserManager, LocalProxy, SessionUser
@@ -70,7 +70,7 @@ class OAuthbasedUserManager(FilebasedUserManager):
                     OAuthbasedUserManager.logger.error("Error of access token, "
                                                        "error message not found")
 
-        except MissingTokenError:
+        except OAuth2Error:
             OAuthbasedUserManager.logger.error("Bad authorization_code")
 
         return None

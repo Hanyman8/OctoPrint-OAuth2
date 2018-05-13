@@ -25,3 +25,5 @@ BAD_ACCESS_TOKEN = "badAT"
 
 GOOD_ACCESS_TOKEN_QUERY_KEY = "token"
 BAD_ACCESS_TOKEN_QUERY_KEY = "nekot"
+
+PATH_TO_GECKO_DRIVER = "/home/hany/Downloads/geckodriver"
