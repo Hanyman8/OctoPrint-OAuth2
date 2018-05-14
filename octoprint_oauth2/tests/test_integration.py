@@ -7,7 +7,7 @@ import time
 import os
 import pytest
 from selenium import webdriver
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, NoSuchElementException
 from octoprint_oauth2.tests.constants_for_tests import GOOD_REDIRECT_URI, PATH_TO_GECKO_DRIVER
 from octoprint_oauth2.tests.fake_oauth2_server import serve_forever
 from octoprint_oauth2.tests.integration_server import run_auth_server
@@ -65,7 +65,7 @@ def get_driver(start_servers):
     Prepare Selenium driver
     """
     # temporary for testing of testing
-    driver = webdriver.Firefox(executable_path= PATH_TO_GECKO_DRIVER)
+    driver = webdriver.Firefox(executable_path=PATH_TO_GECKO_DRIVER)
     driver.implicitly_wait(10)
     driver.get(GOOD_REDIRECT_URI)
     driver.maximize_window()
@@ -83,6 +83,7 @@ def test_login(start_servers):
     title = driver.find_element_by_xpath("//*[@title='Logged in as test_admin']")
     assert title is not None
     driver.quit()
+
 
 def test_logout(start_servers):
     """
@@ -125,7 +126,7 @@ def test_more_users(start_servers):
     title2 = driver2.find_element_by_xpath("//*[@title='Logged in as test_user']")
     assert title2 is not None
 
-    #sleep and refresh to fetch settings from users.yaml
+    # sleep and refresh to fetch settings from users.yaml
     driver1.get(GOOD_REDIRECT_URI)
     time.sleep(2)
     # add admin role to test_user
@@ -142,3 +143,17 @@ def test_more_users(start_servers):
     assert settings.is_displayed() is False
     driver1.quit()
     driver2.quit()
+
+def test_deny_login(start_servers):
+    '''
+    Test if user has declined login
+    '''
+    driver = get_driver(start_servers)
+    driver.find_element_by_id("navbar_plugin_oauth2").click()
+    driver.find_element_by_id("loginForm").click()
+    driver.find_element_by_id("deny").click()
+
+    # this element should not exist.
+    with pytest.raises(NoSuchElementException):
+        driver.find_element_by_xpath("//*[@title='Logged in as test_user']")
+    driver.quit()
