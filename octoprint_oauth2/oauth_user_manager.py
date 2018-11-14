@@ -80,13 +80,12 @@ class OAuthbasedUserManager(FilebasedUserManager):
         This method make a request to resource server.
         Then tries if specific username_key is OK and return username.
         """
-
         try:
             # GET user data from resource server
-            params = {
-                self.access_token_query_key: oauth2_session.access_token
-            }
-            response = requests.get(self.path_user_info, params=params)
+            headers = {
+                "Authorization" : "Bearer " + oauth2_session.access_token
+            } 
+            response = requests.get(self.path_user_info, headers=headers)
             data = response.json()
 
             # Try if data contains username_key from config file
