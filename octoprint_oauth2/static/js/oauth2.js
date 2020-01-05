@@ -77,7 +77,7 @@ $(function() {
 
                     self.loginState.fromResponse(response);
                 })
-                .error(function(error) {
+                .fail(function(error) {
                     if (error && error.status === 401) {
                          self.loginState.fromResponse(false);
                     }
